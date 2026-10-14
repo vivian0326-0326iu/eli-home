@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="styles.css?v=0.5">
   <link rel="stylesheet" href="v04.css?v=0.5">
   <link rel="stylesheet" href="v05.css?v=0.5">
+  <link rel="stylesheet" href="v06.css?v=0.6">
   <title>eli 的小家 · 时光博物馆</title>
 </head>
 <body>
@@ -70,6 +71,7 @@
 </div>
 <div id="overlay" class="overlay" hidden><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><div class="dialog-top"><h2 id="dialogTitle">新建记录</h2><button class="close-btn" id="closeDialog" aria-label="关闭">×</button></div><form id="entryForm"><input id="entryId" type="hidden"><input id="entryType" type="hidden"><label>标题<input id="entryTitle" required maxlength="120" placeholder="给这段回忆取个名字"></label><div class="form-row"><label>日期<input id="entryDate" type="date" required></label><label id="categoryField">分类<select id="entryCategory"><option value="memory">记忆档案</option><option value="project">项目记录</option><option value="thought">观点收藏</option><option value="life">生活记录</option></select></label></div><label>内容<textarea id="entryBody" required maxlength="20000" rows="6" placeholder="写下想保存的内容…"></textarea></label><label id="sourceField">来源 / 依据<input id="entrySource" maxlength="250" placeholder="例如：本次对话、某份文件、个人记录"></label><div class="dialog-actions"><button type="button" class="secondary-button" id="cancelDialog">取消</button><button type="submit" class="primary-button">保存记录</button></div></form></div></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script src="app.js?v=0.5" defer></script>
+<script src="character-v06.js?v=0.6" defer></script>
+<script src="app.js?v=0.6" defer></script>
 </body>
 </html>
