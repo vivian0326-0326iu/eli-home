@@ -1,0 +1,29 @@
+/* V0.6: no photo recoloring overlays. Real independent vector clothing and expressions. */
+[data-avatar] .eli-character-svg{display:block;width:min(100%,282px);height:auto;aspect-ratio:1/1;border-radius:24px;box-shadow:0 10px 25px rgba(65,73,91,.10);overflow:hidden}
+.avatar-wrap,.wardrobe-avatar{display:flex!important;justify-content:center!important;align-items:center!important;width:100%!important;max-width:100%!important}
+.wardrobe-avatar .eli-character-svg{width:min(100%,340px)}
+.character-stage{height:auto!important;min-height:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:12px!important;padding:14px!important}
+.character-stage .speech-bubble{position:static!important;inset:auto!important;width:100%!important;max-width:100%!important;text-align:center!important;box-sizing:border-box!important;line-height:1.65!important;margin:0!important;transform:none!important;padding:10px 14px!important}
+.wardrobe-stage .wardrobe-avatar{margin:0 auto 14px!important}
+.wardrobe-stage #outfitDescription{line-height:1.75}
+.mini-outfit .eli-character-svg,.outfit-card .eli-character-svg{width:100%!important;max-width:100%!important;height:auto!important;aspect-ratio:1;display:block;border-radius:12px;pointer-events:none}
+.mini-outfit{overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.outfit-card{overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:8px}
+.outfit-card .eli-character-svg{max-width:160px!important}
+.outfit-card span{font-size:13px;line-height:1.4}
+.mini-outfit .eli-character-svg{max-width:88px!important}
+.mini-outfit small{font-size:11px}
+[data-mood][aria-pressed="true"]{box-shadow:inset 0 0 0 1px #8eadd7}
+[data-outfit][aria-pressed="true"]{border-color:#94afd4}
+@media(max-width:700px){
+  .character-stage{padding:12px!important}
+  [data-avatar] .eli-character-svg{width:min(100%,270px)}
+  .wardrobe-avatar .eli-character-svg{width:min(100%,340px)}
+  .character-stage .speech-bubble{font-size:13px!important}
+  .mini-outfit .eli-character-svg{max-width:75px!important}
+  .outfit-card .eli-character-svg{max-width:150px!important}
+}
+@media(prefers-reduced-motion:no-preference){
+  [data-avatar] .eli-character-svg{animation:eli-avatar-appear .22s ease-out}
+  @keyframes eli-avatar-appear{from{opacity:.75;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
+}
