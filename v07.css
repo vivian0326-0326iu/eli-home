@@ -1,0 +1,15 @@
+/* V0.7: real illustrated outfits and expressions. No SVG character or tint overlays. */
+[data-avatar] .eli-illustration-set{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:9px;margin:0 auto}
+[data-avatar] .eli-illustration-main{display:block;width:min(100%,320px);height:auto;aspect-ratio:1.1;object-fit:cover;border-radius:20px;box-shadow:0 9px 25px rgba(65,73,91,.11);background:#f6f0eb}
+[data-avatar] .eli-illustration-detail{display:flex;align-items:center;justify-content:center;gap:10px;max-width:100%;border:1px solid #e7ebf3;border-radius:999px;padding:5px 14px 5px 5px;background:rgba(255,255,255,.92);color:#718098;font-size:12px}
+[data-avatar] .eli-illustration-small{width:43px;height:43px;object-fit:cover;border-radius:50%;flex-shrink:0}
+.wardrobe-avatar .eli-illustration-main{width:min(100%,345px)}
+.mini-outfit .eli-illustration-thumb,.outfit-card .eli-illustration-thumb{display:block;width:100%;height:auto;aspect-ratio:1.08;object-fit:cover;border-radius:12px;pointer-events:none}
+.mini-outfit,.outfit-card{overflow:hidden}
+.mini-outfit .eli-illustration-thumb{max-width:105px}
+.outfit-card .eli-illustration-thumb{max-width:200px;margin:auto}
+.character-stage .speech-bubble{position:static!important;width:100%;max-width:100%;box-sizing:border-box;text-align:center;line-height:1.6;margin:0;transform:none!important}
+.character-stage{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:14px!important;height:auto!important;min-height:0!important}
+.avatar-wrap,.wardrobe-avatar{display:flex!important;align-items:center;justify-content:center;width:100%!important;max-width:100%!important}
+.wardrobe-stage #outfitDescription{line-height:1.75}
+@media(max-width:700px){[data-avatar] .eli-illustration-main{width:min(100%,300px)}.wardrobe-avatar .eli-illustration-main{width:min(100%,330px)}.mini-outfit .eli-illustration-thumb{max-width:96px}.outfit-card .eli-illustration-thumb{max-width:165px}.character-stage{padding:12px!important}}
