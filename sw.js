@@ -1,7 +1,7 @@
 // Cache app shell for offline use; network first so GitHub Pages updates propagate.
 const CACHE = 'eli-home-v8';
 const ASSETS = [
-  './', './index.html', './styles.css?v=0.8', './v04.css?v=0.5',
+  './', './index.html', './styles.css?v=0.8', './v04.css?v=0.8',
   './v07.css?v=0.7', './v08.css?v=0.8', './app.js?v=0.8',
   './manifest.webmanifest',
   './assets/rooms/sunlit-bedroom.webp', './assets/rooms/window-workspace.webp',
