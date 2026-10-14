@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>eli · 换装与表情测试</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;color:#40516b;background:#edf2f8}body{margin:0;padding:18px;max-width:1100px;margin:auto}h1{font-size:24px}p{line-height:1.7;color:#718099}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.item{background:white;border:1px solid #e1e7f0;border-radius:18px;padding:10px;text-align:center;box-shadow:0 8px 24px #6b73810b}.item svg{width:100%;max-width:210px;height:auto;display:block;margin:auto}.item small{display:block;margin-top:8px}a{color:#587aa5}@media(max-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:21px}}.ok{color:#327e61}
+</style></head><body><a href="./">← 返回小家</a><h1>eli 的衣柜 · 24 种组合</h1><p>这是开发检查页。每一张图都由独立的服装款式和面部表情绘制，不是给原照片叠加颜色。</p><div id="status" role="status"></div><div class="grid" id="grid"></div>
+<script src="character-v06.js?v=0.6"></script>
+<script>
+const clothes=[['charcoal','炭灰卫衣'],['cream','奶油毛衣'],['mist','雾蓝外套'],['sage','鼠尾草绿'],['rose','灰粉针织'],['white','白衬衫']];
+const moods=[['sleepy','困困'],['happy','开心'],['calm','安静'],['cheer','打气']];
+const all=clothes.flatMap(([id,name])=>moods.map(([m,label])=>({id,name,m,label,svg:window.eliCharacterSVG(id,m)})));
+document.getElementById('grid').innerHTML=all.map(x=>'<div class="item">'+x.svg+'<small>'+x.name+' · '+x.label+'</small></div>').join('');
+const ok=new Set(all.map(x=>x.svg)).size===24;
+document.getElementById('status').innerHTML='<p class="'+(ok?'ok':'')+'">组合检查：'+(ok?'24 / 24 各不相同 ✓':'检查未通过')+'</p>';
+</script></body></html>
