@@ -25,9 +25,15 @@ assert.ok(!app.includes('eli-art-reference'), 'Small original-art reference must
 assert.ok(app.includes('illustrationMode'), 'Image display mode must be explicit');
 for(const id of ['charcoal','cream','mist','sage','rose','white'])assert.ok(app.includes("id:'"+id+"'"),'Missing independent color '+id);
 assert.ok(!html.includes('<script src="character-v06.js'),'Old SVG character must not load');
-assert.ok(html.includes('app.js?v=0.10'));
-assert.ok(html.includes('v09.css?v=0.10'));
+assert.ok(html.includes('app.js?v=0.11'));
+assert.ok(html.includes('v09.css?v=0.11'));
 assert.ok(html.includes('wardrobePalette'));
+assert.ok(html.includes('data-illustration-preview="outfit"'));
+assert.ok(html.includes('data-illustration-preview="mood"'));
+assert.ok(app.includes("eli-choice-outfit-v1"));
+assert.ok(app.includes("eli-choice-color-v1"));
+assert.ok(app.includes("eli-choice-mood-v1"));
+assert.ok(app.includes('target.dataset.illustrationPreview'));
 assert.ok(html.includes('healthImportFile'));
 assert.ok(app.includes('importHealthJson'));
 assert.ok(app.includes('intakeForDate'));
@@ -35,7 +41,7 @@ assert.ok(html.includes('v07.css?v=0.7'));
 assert.ok(html.includes('v08.css?v=0.8'));
 assert.ok(html.includes('heroSceneStrip'));
 assert.ok(html.includes('dataStatus'));
-assert.ok(sw.includes('eli-home-v10'));
+assert.ok(sw.includes('eli-home-v11'));
 for(const id of ['day','night','work','rain'])assert.ok(app.includes("id:'"+id+"'"),'Missing room '+id);
 for(const file of ['sunlit-bedroom.webp','window-workspace.webp']){
   const buf=fs.readFileSync('assets/rooms/'+file);

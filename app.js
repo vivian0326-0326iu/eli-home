@@ -1,6 +1,7 @@
 (() => {
 'use strict';
 const STORAGE='eli-home-mvp-v1'; // Stable key: upgrades must not erase existing local records.
+const CHOICE_KEYS={outfit:'eli-choice-outfit-v1',color:'eli-choice-color-v1',mood:'eli-choice-mood-v1'};
 const outfits=[{id:'charcoal',name:'宽松卫衣',color:'#454750',accent:'#33353c',desc:'有帽绳和大口袋的宽松卫衣。'},{id:'cream',name:'柔软毛衣',color:'#e9ddd0',accent:'#c6b8a8',desc:'柔软圆领毛衣，带细密的罗纹。'},{id:'mist',name:'轻薄外套',color:'#9fb8d3',accent:'#708fae',desc:'有拉链和翻领的轻薄外套。'},{id:'sage',name:'绞花针织衫',color:'#aabfae',accent:'#7b9d8a',desc:'有绞花纹理的针织衫。'},{id:'rose',name:'针织开衫',color:'#cdaeb5',accent:'#aa8893',desc:'敞开式针织开衫，内搭浅色上衣。'},{id:'white',name:'翻领衬衫',color:'#f3f3f0',accent:'#bfc7cd',desc:'带翻领与纽扣的清爽衬衫。'}];
 const colors=[
 {id:'charcoal',name:'炭灰',value:'#454750',line:'#292c34'},
@@ -23,6 +24,7 @@ const defaultState=()=>({version:1,outfit:'charcoal',color:'charcoal',mood:'slee
 function validItem(x,type){return x&&typeof x==='object'&&typeof x.id==='string'&&typeof x.title==='string'&&typeof x.date==='string'&&typeof x.body==='string'&&x.title.length<=120&&x.body.length<=20000&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&(type==='diary'||(categories[x.category]&&typeof x.source==='string'&&x.source.length<=250));}
 function validateState(x){return x&&x.version===1&&outfits.some(o=>o.id===x.outfit)&&rooms.some(r=>r.id===x.room)&&moods[x.mood]&&Array.isArray(x.diaries)&&Array.isArray(x.memories)&&x.diaries.length<=10000&&x.memories.length<=10000&&x.diaries.every(v=>validItem(v,'diary'))&&x.memories.every(v=>validItem(v,'memory'));}
 let state=defaultState();try{const saved=JSON.parse(localStorage.getItem(STORAGE));if(validateState(saved))state={...saved,color:colors.some(c=>c.id===saved.color)?saved.color:saved.outfit};}catch(e){console.warn('无法读取本地记录',e)}
+for(const [key,ids] of [['outfit',outfits.map(x=>x.id)],['color',colors.map(x=>x.id)],['mood',Object.keys(moods)]]){try{const value=localStorage.getItem(CHOICE_KEYS[key]);if(ids.includes(value))state[key]=value;else localStorage.setItem(CHOICE_KEYS[key],state[key])}catch(e){console.warn('无法读取独立偏好：'+key,e)}}
 let page='home';let toastTimer;
 const LIFE_KEY='eli-home-life-v1';
 const HEALTH_SHEET='https://script.google.com/macros/s/AKfycbyb_vAIWn4ipc2sWVKAfEgcI3e6_GnFK1PUo7nioUdSaV3SfTXIORGPuxv2BJvdTxF9/exec';
@@ -90,7 +92,7 @@ function openLink(url){window.open(url,'_blank','noopener,noreferrer')}
 
 const $=id=>document.getElementById(id);const all=(s,root=document)=>Array.from(root.querySelectorAll(s));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));return true}catch(e){toast('保存失败：本地存储可能已满');return false}}
+function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));localStorage.setItem(CHOICE_KEYS.outfit,state.outfit);localStorage.setItem(CHOICE_KEYS.color,state.color);localStorage.setItem(CHOICE_KEYS.mood,state.mood);return true}catch(e){toast('保存失败：请检查浏览器存储');return false}}
 function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2700)}
 function chinaDate(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).replaceAll('/','-')}
 function displayDate(date){const p=date.split('-');return p.length===3?`${p[0]}年${+p[1]}月${+p[2]}日`:date}
@@ -114,7 +116,8 @@ function renderAvatar(){
  });
  $('characterSpeech').textContent=mood.speech;
  all('[data-mood]').forEach(b=>{b.classList.toggle('selected',b.dataset.mood===state.mood);b.setAttribute('aria-pressed',String(b.dataset.mood===state.mood))});
- $('outfitDescription').textContent='已选：'+outfit.name+' · '+color.name+'色 · '+mood.name+'表情。三项会分别保存。现有完整原画无法拆分组合，主图显示最近选择的服装图或表情图；颜色只保存偏好，不改变原画。';
+ all('[data-illustration-preview]').forEach(b=>{b.classList.toggle('selected',b.dataset.illustrationPreview===illustrationMode);b.setAttribute('aria-pressed',String(b.dataset.illustrationPreview===illustrationMode))});
+ $('outfitDescription').textContent='已分别保存：'+outfit.name+' · '+color.name+'色 · '+mood.name+'表情。服装与表情原画由下方按钮切换；颜色只保存偏好，不改变原画。';
 }
 function renderOutfits(){
  const thumb=o=>'<img class="eli-illustration-thumb" src="'+illustrationUrl(illustrationOutfits[o.id])+'" alt="'+o.name+'原画" loading="lazy">';
@@ -149,7 +152,7 @@ function deleteEntry(type,id){const arr=type==='diary'?state.diaries:state.memor
 function exportData(){const blob=new Blob([JSON.stringify({...state,life,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`eli-home-backup-${chinaDate()}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('备份文件已生成')}
 async function importData(file){if(!file)return;try{if(file.size>8*1024*1024)throw Error('文件超过 8MB');const parsed=JSON.parse(await file.text());if(!validateState(parsed))throw Error('备份格式不正确或数据不完整');if(!confirm('导入将替换当前浏览器的所有日记、藏品与装扮。确定继续吗？'))return;state={version:1,outfit:parsed.outfit,color:colors.some(c=>c.id===parsed.color)?parsed.color:parsed.outfit,mood:parsed.mood,room:parsed.room,diaries:parsed.diaries,memories:parsed.memories};if(save()){if(parsed.life&&typeof parsed.life==='object'){life={healthUrl:validUrl(parsed.life.healthUrl)?parsed.life.healthUrl||'':'',ledgerUrl:validUrl(parsed.life.ledgerUrl)?parsed.life.ledgerUrl||'':'',intake:parsed.life.intake&&typeof parsed.life.intake==='object'?parsed.life.intake:{},healthImport:parsed.life.healthImport?.source==='日常有迹-GoogleAppsScript'&&parsed.life.healthImport.daily&&typeof parsed.life.healthImport.importedAt==='string'?parsed.life.healthImport:null};saveLife()}render();loadIntakeDay();toast('备份已恢复 ♡')}}catch(e){toast(`导入失败：${e.message}`)}finally{$('importFile').value=''}}
 // Single delegated click handler keeps dynamic content interactive.
-document.addEventListener('click',e=>{const target=e.target.closest('button');if(!target)return;if(target.dataset.outfit){state.outfit=target.dataset.outfit;illustrationMode='outfit';try{localStorage.setItem('eli-illustration-mode',illustrationMode)}catch(e){}save();renderAvatar();renderOutfits()}if(target.dataset.color){state.color=target.dataset.color;save();renderAvatar();renderOutfits()}if(target.dataset.mood){state.mood=target.dataset.mood;illustrationMode='mood';try{localStorage.setItem('eli-illustration-mode',illustrationMode)}catch(e){}save();renderAvatar();renderOutfits()}if(target.dataset.room){state.room=target.dataset.room;save();renderRooms()}if(target.dataset.go)navigate(target.dataset.go);if(target.dataset.page)navigate(target.dataset.page);if(target.dataset.edit)openDialog(target.dataset.edit,target.dataset.id);if(target.dataset.delete)deleteEntry(target.dataset.delete,target.dataset.id)});
+document.addEventListener('click',e=>{const target=e.target.closest('button');if(!target)return;if(target.dataset.outfit){state.outfit=target.dataset.outfit;save();renderAvatar();renderOutfits()}if(target.dataset.color){state.color=target.dataset.color;save();renderAvatar();renderOutfits()}if(target.dataset.mood){state.mood=target.dataset.mood;save();renderAvatar();renderOutfits()}if(target.dataset.illustrationPreview){illustrationMode=target.dataset.illustrationPreview;try{localStorage.setItem('eli-illustration-mode',illustrationMode)}catch(e){}renderAvatar()}if(target.dataset.room){state.room=target.dataset.room;save();renderRooms()}if(target.dataset.go)navigate(target.dataset.go);if(target.dataset.page)navigate(target.dataset.page);if(target.dataset.edit)openDialog(target.dataset.edit,target.dataset.id);if(target.dataset.delete)deleteEntry(target.dataset.delete,target.dataset.id)});
 $('quickIntake').addEventListener('click',()=>{navigate('hub');$('intakeInputDate').value=chinaDate();loadIntakeDay();$('intakeCalories').focus()});
 $('openHealth').addEventListener('click',()=>openLink(life.healthUrl||HEALTH_SHEET));
 $('openHealthImport').addEventListener('click',()=>openLink(life.healthUrl||HEALTH_SHEET));

@@ -1,4 +1,4 @@
-/* V0.10: use the original full-frame illustrations as the only character art. */
+/* V0.11: use original full-frame illustrations and keep preview mode separate from saved choices. */
 [data-avatar]{width:100%;}
 [data-avatar] .eli-illustration-main{display:block;width:min(100%,356px);height:auto;max-height:100%;object-fit:contain;border-radius:20px;box-shadow:0 9px 25px rgba(65,73,91,.11);background:#f6f0eb;margin:0 auto}
 .wardrobe-avatar .eli-illustration-main{width:min(100%,356px)}
@@ -7,6 +7,8 @@
 .avatar-wrap,.wardrobe-avatar{display:flex!important;align-items:center;justify-content:center;width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;transform:none!important}
 .avatar-wrap .eli-illustration-main{width:min(100%,356px)}
 .wardrobe-stage #outfitDescription{line-height:1.75}
+.illustration-preview-tabs{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
+.illustration-preview-tabs .chip{min-height:38px}
 .palette-dots{gap:10px;display:flex;flex-wrap:wrap;padding:4px 0}
 .palette-dots .palette-dot{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #d7dfe8;transition:box-shadow .15s,transform .15s}
 .palette-dots .palette-dot.selected{box-shadow:0 0 0 3px #8aabcf,0 3px 8px #516b8720;transform:scale(1.08)}
