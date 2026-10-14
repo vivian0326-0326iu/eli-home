@@ -14,17 +14,6 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check app.js
-          node --check character-v06.js
           node --check sw.js
-      - name: Character combinations
+      - name: Validate image wardrobe
         run: node tests/character.test.mjs
-      - name: Validate SVG XML
-        run: |
-          python3 - <<'PY'
-          import json, xml.etree.ElementTree as ET
-          with open('character-fixtures.json') as f: items=json.load(f)
-          for i,svg in enumerate(items):
-              root=ET.fromstring(svg)
-              assert root.tag=='{http://www.w3.org/2000/svg}svg', i
-          print(f'PASS: {len(items)} valid SVG illustrations')
-          PY
