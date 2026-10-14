@@ -12,9 +12,9 @@ function validateState(x){return x&&x.version===1&&outfits.some(o=>o.id===x.outf
 let state=defaultState();try{const saved=JSON.parse(localStorage.getItem(STORAGE));if(validateState(saved))state=saved;}catch(e){console.warn('无法读取本地记录',e)}
 let page='home';let toastTimer;
 const LIFE_KEY='eli-home-life-v1';
-const HEALTH_SHEET='https://docs.google.com/spreadsheets/d/1q998KeljgLacnVRNlaf91KG0ZwTj0GzpOQ3oaDuN4to/edit';
-let life={healthUrl:'',ledgerUrl:'',intake:{}};
-try{const x=JSON.parse(localStorage.getItem(LIFE_KEY));if(x&&typeof x==='object'){life={healthUrl:typeof x.healthUrl==='string'?x.healthUrl:'',ledgerUrl:typeof x.ledgerUrl==='string'?x.ledgerUrl:'',intake:x.intake&&typeof x.intake==='object'?x.intake:{}}}}catch(e){}
+const HEALTH_SHEET='https://script.google.com/macros/s/AKfycbyb_vAIWn4ipc2sWVKAfEgcI3e6_GnFK1PUo7nioUdSaV3SfTXIORGPuxv2BJvdTxF9/exec';
+let life={healthUrl:'https://script.google.com/macros/s/AKfycbyb_vAIWn4ipc2sWVKAfEgcI3e6_GnFK1PUo7nioUdSaV3SfTXIORGPuxv2BJvdTxF9/exec',ledgerUrl:'https://xiru-jizhang-workbench.tinychub18.chatgpt.site/#',intake:{}};
+try{const x=JSON.parse(localStorage.getItem(LIFE_KEY));if(x&&typeof x==='object'){life={healthUrl:typeof x.healthUrl==='string'&&x.healthUrl?x.healthUrl:life.healthUrl,ledgerUrl:typeof x.ledgerUrl==='string'&&x.ledgerUrl?x.ledgerUrl:life.ledgerUrl,intake:x.intake&&typeof x.intake==='object'?x.intake:{}}}}catch(e){}
 function saveLife(){try{localStorage.setItem(LIFE_KEY,JSON.stringify(life));return true}catch(e){toast('保存失败，请检查浏览器存储');return false}}
 function validUrl(v){if(!v)return true;try{const u=new URL(v);return u.protocol==='https:'}catch(e){return false}}
 function renderLife(){const date=chinaDate();$('intakeDate').textContent=date+' · 今日摄入';const v=life.intake[date];$('intakeValue').innerHTML=v&&Number.isFinite(v.calories)?`${v.calories} <small>kcal</small>`:'未记录';$('intakeStatus').textContent=v&&Number.isFinite(v.calories)?(v.completeness==='complete'?'本机记录 · 已确认全天':'本机记录 · 仅已记录，未确认全天'):'尚无今日摄入记录 · 不等于 0 kcal';$('ledgerStatus').textContent=life.ledgerUrl?'已绑定记账网站，点击即可前往。':'记账网站尚未绑定网址，可在生活中心设置。';$('hubIntakeInfo').textContent=`${date} · ${v&&Number.isFinite(v.calories)?v.calories+' kcal':'未记录'} · ${v?(v.completeness==='complete'?'已确认全天':'仅已记录'):'无记录'}`;$('intakeInputDate').value=$('intakeInputDate').value||date;$('healthUrl').value=life.healthUrl;$('ledgerUrl').value=life.ledgerUrl;}
