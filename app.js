@@ -26,15 +26,64 @@ let state=defaultState();try{const saved=JSON.parse(localStorage.getItem(STORAGE
 let page='home';let toastTimer;
 const LIFE_KEY='eli-home-life-v1';
 const HEALTH_SHEET='https://script.google.com/macros/s/AKfycbyb_vAIWn4ipc2sWVKAfEgcI3e6_GnFK1PUo7nioUdSaV3SfTXIORGPuxv2BJvdTxF9/exec';
-let life={healthUrl:'https://script.google.com/macros/s/AKfycbyb_vAIWn4ipc2sWVKAfEgcI3e6_GnFK1PUo7nioUdSaV3SfTXIORGPuxv2BJvdTxF9/exec',ledgerUrl:'https://xiru-jizhang-workbench.tinychub18.chatgpt.site/#',intake:{}};
-try{const x=JSON.parse(localStorage.getItem(LIFE_KEY));if(x&&typeof x==='object'){life={healthUrl:typeof x.healthUrl==='string'&&x.healthUrl?x.healthUrl:life.healthUrl,ledgerUrl:typeof x.ledgerUrl==='string'&&x.ledgerUrl?x.ledgerUrl:life.ledgerUrl,intake:x.intake&&typeof x.intake==='object'?x.intake:{}}}}catch(e){}
+let life={healthUrl:'https://script.google.com/macros/s/AKfycbyb_vAIWn4ipc2sWVKAfEgcI3e6_GnFK1PUo7nioUdSaV3SfTXIORGPuxv2BJvdTxF9/exec',ledgerUrl:'https://xiru-jizhang-workbench.tinychub18.chatgpt.site/#',intake:{},healthImport:null};
+try{const x=JSON.parse(localStorage.getItem(LIFE_KEY));if(x&&typeof x==='object'){life={healthUrl:typeof x.healthUrl==='string'&&x.healthUrl?x.healthUrl:life.healthUrl,ledgerUrl:typeof x.ledgerUrl==='string'&&x.ledgerUrl?x.ledgerUrl:life.ledgerUrl,intake:x.intake&&typeof x.intake==='object'?x.intake:{},healthImport:x.healthImport&&typeof x.healthImport==='object'&&x.healthImport.source==='日常有迹-GoogleAppsScript'?x.healthImport:null}}}catch(e){}
 function saveLife(){try{localStorage.setItem(LIFE_KEY,JSON.stringify(life));return true}catch(e){toast('保存失败，请检查浏览器存储');return false}}
 function validUrl(v){if(!v)return true;try{const u=new URL(v);return u.protocol==='https:'}catch(e){return false}}
-function renderLife(){const date=chinaDate();$('intakeDate').textContent=date+' · 今日摄入';const v=life.intake[date];$('intakeValue').innerHTML=v&&Number.isFinite(v.calories)?`${v.calories} <small>kcal</small>`:'未记录';$('intakeStatus').textContent=v&&Number.isFinite(v.calories)?(v.completeness==='complete'?'本机记录 · 已确认全天':'本机记录 · 仅已记录，未确认全天'):'尚无今日摄入记录 · 不等于 0 kcal';$('ledgerStatus').textContent=life.ledgerUrl?'已绑定记账网站，点击即可前往。':'记账网站尚未绑定网址，可在生活中心设置。';$('hubIntakeInfo').textContent=`${date} · ${v&&Number.isFinite(v.calories)?v.calories+' kcal':'未记录'} · ${v?(v.completeness==='complete'?'已确认全天':'仅已记录'):'无记录'}`;$('intakeInputDate').value=$('intakeInputDate').value||date;$('healthUrl').value=life.healthUrl;$('ledgerUrl').value=life.ledgerUrl;renderDataStatus();}
+function intakeForDate(date){
+ const manual=life.intake[date],cloud=life.healthImport?.daily?.[date];
+ const useManual=manual&&Number.isFinite(manual.calories)&&(!cloud||manual.updatedAt&&manual.updatedAt>=life.healthImport.importedAt);
+ if(useManual)return {...manual,origin:'本机手动'};
+ if(cloud&&Number.isFinite(cloud.calories))return {...cloud,origin:'日常有迹 JSON 快照'};
+ if(manual&&Number.isFinite(manual.calories))return {...manual,origin:'本机手动'};
+ return null;
+}
+function renderLife(){
+ const date=chinaDate(),v=intakeForDate(date),has=!!v;
+ $('intakeDate').textContent=date+' · 北京时间';
+ $('intakeValue').innerHTML=has?v.calories+' <small>kcal</small>':'未记录';
+ const complete=v?.completeness==='complete'?'已确认全天':'仅已记录，未确认全天';
+ const snapshot=life.healthImport;
+ $('intakeStatus').textContent=has?(v.origin+' · '+complete+(v.count>1?' · '+v.count+'条合计，注意核对':'')):'尚无今日摄入记录，不等于 0 kcal';
+ if(v?.origin==='日常有迹 JSON 快照')$('intakeStatus').textContent+=' · 非实时';
+ $('ledgerStatus').textContent=life.ledgerUrl?'已绑定记账网站，点击即可前往。':'记账网站尚未绑定网址，可在生活中心设置。';
+ $('hubIntakeInfo').textContent=date+' · '+(has?v.calories+' kcal':'未记录')+' · '+(has?v.origin+' · '+complete:'无今日记录');
+ $('intakeInputDate').value=$('intakeInputDate').value||date;
+ $('healthUrl').value=life.healthUrl;$('ledgerUrl').value=life.ledgerUrl;
+ const status=$('healthImportStatus');
+ if(status)status.textContent=snapshot?'最近一次导入：'+new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',dateStyle:'medium',timeStyle:'short'}).format(new Date(snapshot.importedAt))+'。包含 '+Object.keys(snapshot.daily).length+' 天的热量记录。来源：日常有迹导出 JSON。不是实时同步。':'尚未导入「日常有迹」数据。点击导入 JSON 可以读取真实记录，不需要重复手填；目前没有跨站实时同步。';
+ renderDataStatus();
+}
 function renderDataStatus(){
   const el=$('dataStatus');if(!el)return;
   const days=Object.keys(life.intake).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).length;
-  el.textContent='本机已有 '+state.diaries.length+' 篇日记、'+state.memories.length+' 件藏品、'+days+' 天手动摄入记录。房间、服装、表情和两个网站入口也会随备份导出。所有私人数据仅保存在当前浏览器。';
+  el.textContent='本机已有 '+state.diaries.length+' 篇日记、'+state.memories.length+' 件藏品、'+days+' 天手动摄入记录，'+Object.keys(life.healthImport?.daily||{}).length+' 天「日常有迹」导入快照。房间、衣服、颜色、表情及网站入口会随备份导出。所有私人数据仅保存在当前浏览器。';
+}
+async function importHealthJson(file){
+ if(!file)return;
+ try{
+  if(file.size>8*1024*1024)throw Error('文件超过 8MB，请先从日常有迹导出较小的 JSON');
+  const obj=JSON.parse(await file.text());
+  if(!obj||obj.source!=='日常有迹-GoogleAppsScript'||!Array.isArray(obj.rows))throw Error('这不是日常有迹导出的 JSON 备份');
+  if(obj.rows.length>50000)throw Error('记录太多，已停止导入');
+  const daily=Object.create(null);
+  for(const row of obj.rows){
+   if(!row||row.kind!=='nutrition'||!/^\d{4}-\d{2}-\d{2}$/.test(row.date))continue;
+   if(row.calories===null||row.calories===undefined||row.calories==='')continue;
+   const n=Number(row.calories);if(!Number.isFinite(n)||n<0||n>30000)continue;
+   const x=daily[row.date]||(daily[row.date]={calories:0,count:0,completeness:'partial'});
+   x.calories+=n;x.count++;
+   if(x.count===1&&row.completeness==='complete')x.completeness='complete';
+   else if(x.count>1)x.completeness='partial';
+  }
+  for(const x of Object.values(daily))x.calories=Math.round(x.calories*10)/10;
+  if(!Object.keys(daily).length)throw Error('没有找到带热量的饮食记录，未覆盖旧数据');
+  const previous=life.healthImport;
+  life.healthImport={source:'日常有迹-GoogleAppsScript',importedAt:new Date().toISOString(),exportedAt:typeof obj.exported_at==='string'?obj.exported_at:null,daily};
+  if(!saveLife()){life.healthImport=previous;return}
+  renderLife();toast('已导入 '+Object.keys(daily).length+' 天真实热量快照（非实时）');
+ }catch(e){toast('导入失败：'+e.message)}
+ finally{$('healthImportFile').value=''}
 }
 function loadIntakeDay(){const v=life.intake[$('intakeInputDate').value];$('intakeCalories').value=v&&Number.isFinite(v.calories)?String(v.calories):'';$('intakeCompleteness').value=v?.completeness==='complete'?'complete':'partial'}
 function openLink(url){window.open(url,'_blank','noopener,noreferrer')}
@@ -112,7 +161,7 @@ function closeDialog(){$('overlay').hidden=true}
 function saveEntry(e){e.preventDefault();const type=$('entryType').value;const arr=type==='diary'?state.diaries:state.memories;const id=$('entryId').value;const old=arr.find(x=>x.id===id);const entry={id:old?.id||makeId(),title:$('entryTitle').value.trim(),date:$('entryDate').value,body:$('entryBody').value.trim(),createdAt:old?.createdAt||new Date().toISOString()};if(type==='memory'){entry.category=$('entryCategory').value;entry.source=$('entrySource').value.trim()}if(!validItem(entry,type)){toast('请检查标题、日期和内容');return}if(old)arr[arr.indexOf(old)]=entry;else arr.push(entry);if(save()){closeDialog();render();navigate(type==='diary'?'diary':'museum');toast('已经保存到当前浏览器 ♡')}}
 function deleteEntry(type,id){const arr=type==='diary'?state.diaries:state.memories;const item=arr.find(x=>x.id===id);if(!item||!confirm(`确定删除「${item.title}」吗？`))return;const idx=arr.indexOf(item);arr.splice(idx,1);save();render();toast('已删除')}
 function exportData(){const blob=new Blob([JSON.stringify({...state,life,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`eli-home-backup-${chinaDate()}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('备份文件已生成')}
-async function importData(file){if(!file)return;try{if(file.size>8*1024*1024)throw Error('文件超过 8MB');const parsed=JSON.parse(await file.text());if(!validateState(parsed))throw Error('备份格式不正确或数据不完整');if(!confirm('导入将替换当前浏览器的所有日记、藏品与装扮。确定继续吗？'))return;state={version:1,outfit:parsed.outfit,color:colors.some(c=>c.id===parsed.color)?parsed.color:parsed.outfit,mood:parsed.mood,room:parsed.room,diaries:parsed.diaries,memories:parsed.memories};if(save()){if(parsed.life&&typeof parsed.life==='object'){life={healthUrl:validUrl(parsed.life.healthUrl)?parsed.life.healthUrl||'':'',ledgerUrl:validUrl(parsed.life.ledgerUrl)?parsed.life.ledgerUrl||'':'',intake:parsed.life.intake&&typeof parsed.life.intake==='object'?parsed.life.intake:{}};saveLife()}render();loadIntakeDay();toast('备份已恢复 ♡')}}catch(e){toast(`导入失败：${e.message}`)}finally{$('importFile').value=''}}
+async function importData(file){if(!file)return;try{if(file.size>8*1024*1024)throw Error('文件超过 8MB');const parsed=JSON.parse(await file.text());if(!validateState(parsed))throw Error('备份格式不正确或数据不完整');if(!confirm('导入将替换当前浏览器的所有日记、藏品与装扮。确定继续吗？'))return;state={version:1,outfit:parsed.outfit,color:colors.some(c=>c.id===parsed.color)?parsed.color:parsed.outfit,mood:parsed.mood,room:parsed.room,diaries:parsed.diaries,memories:parsed.memories};if(save()){if(parsed.life&&typeof parsed.life==='object'){life={healthUrl:validUrl(parsed.life.healthUrl)?parsed.life.healthUrl||'':'',ledgerUrl:validUrl(parsed.life.ledgerUrl)?parsed.life.ledgerUrl||'':'',intake:parsed.life.intake&&typeof parsed.life.intake==='object'?parsed.life.intake:{},healthImport:parsed.life.healthImport?.source==='日常有迹-GoogleAppsScript'?parsed.life.healthImport:null};saveLife()}render();loadIntakeDay();toast('备份已恢复 ♡')}}catch(e){toast(`导入失败：${e.message}`)}finally{$('importFile').value=''}}
 // Single delegated click handler keeps dynamic content interactive.
 document.addEventListener('click',e=>{const target=e.target.closest('button');if(!target)return;if(target.dataset.outfit){state.outfit=target.dataset.outfit;save();renderAvatar();renderOutfits()}if(target.dataset.color){state.color=target.dataset.color;save();renderAvatar();renderOutfits()}if(target.dataset.mood){state.mood=target.dataset.mood;save();renderAvatar();renderOutfits()}if(target.dataset.room){state.room=target.dataset.room;save();renderRooms()}if(target.dataset.go)navigate(target.dataset.go);if(target.dataset.page)navigate(target.dataset.page);if(target.dataset.edit)openDialog(target.dataset.edit,target.dataset.id);if(target.dataset.delete)deleteEntry(target.dataset.delete,target.dataset.id)});
 $('quickIntake').addEventListener('click',()=>{navigate('hub');$('intakeInputDate').value=chinaDate();loadIntakeDay();$('intakeCalories').focus()});
@@ -120,7 +169,8 @@ $('openHealth').addEventListener('click',()=>openLink(life.healthUrl||HEALTH_SHE
 $('openLedger').addEventListener('click',()=>{if(life.ledgerUrl)openLink(life.ledgerUrl);else{navigate('hub');$('ledgerUrl').focus();toast('先填入记账网站地址')}});
 $('siteLinksForm').addEventListener('submit',e=>{e.preventDefault();const h=$('healthUrl').value.trim(),l=$('ledgerUrl').value.trim();if(!validUrl(h)||!validUrl(l)){toast('请输入 https:// 开头的安全网址');return}life.healthUrl=h;life.ledgerUrl=l;if(saveLife()){renderLife();toast('网站链接已保存到本机 ♡')}});
 $('intakeInputDate').addEventListener('change',loadIntakeDay);
-$('intakeForm').addEventListener('submit',e=>{e.preventDefault();const d=$('intakeInputDate').value,v=$('intakeCalories').value.trim();if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){toast('请选择日期');return}if(v===''){toast('未填写数值不会记成 0');return}const n=Number(v);if(!Number.isInteger(n)||n<0||n>20000){toast('请输入 0 至 20000 的整数');return}life.intake[d]={calories:n,completeness:$('intakeCompleteness').value};if(saveLife()){renderLife();toast('本机摄入已记录，未同步至日常有迹')}});
+$('healthImportFile').addEventListener('change',e=>importHealthJson(e.target.files?.[0]));
+$('intakeForm').addEventListener('submit',e=>{e.preventDefault();const d=$('intakeInputDate').value,v=$('intakeCalories').value.trim();if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){toast('请选择日期');return}if(v===''){toast('未填写数值不会记成 0');return}const n=Number(v);if(!Number.isInteger(n)||n<0||n>20000){toast('请输入 0 至 20000 的整数');return}life.intake[d]={calories:n,completeness:$('intakeCompleteness').value,updatedAt:new Date().toISOString()};if(saveLife()){renderLife();toast('本机摄入已记录，未同步至日常有迹')}});
 $('removeIntake').addEventListener('click',()=>{delete life.intake[$('intakeInputDate').value];if(saveLife()){loadIntakeDay();renderLife();toast('已清除该日的本机记录')}});
 $('menuBtn').addEventListener('click' ,()=>document.querySelector('.sidebar').classList.toggle('open'));
 $('newDiaryHome').addEventListener('click',()=>openDialog('diary'));
