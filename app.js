@@ -2,7 +2,12 @@
 'use strict';
 const STORAGE='eli-home-mvp-v1'; // Stable key: upgrades must not erase existing local records.
 const outfits=[{id:'charcoal',name:'炭灰卫衣',color:'#454750',accent:'#33353c',desc:'宽松的炭灰卫衣，像刚刚起床。'},{id:'cream',name:'奶油毛衣',color:'#e9ddd0',accent:'#c6b8a8',desc:'软乎乎的奶油毛衣，适合慢悠悠的一天。'},{id:'mist',name:'雾蓝外套',color:'#9fb8d3',accent:'#708fae',desc:'雾蓝色的小外套，和小家的颜色很搭。'},{id:'sage',name:'休闲针织',color:'#aabfae',accent:'#7b9d8a',desc:'一件安静的绿色上衣。'},{id:'rose',name:'针织开衫',color:'#cdaeb5',accent:'#aa8893',desc:'一点点粉色，刚刚好。'},{id:'white',name:'白色衬衫',color:'#f3f3f0',accent:'#bfc7cd',desc:'今天是清清爽爽的白衬衫。'}];
-const rooms=[{id:'day',name:'晴日卧室',desc:'午后的阳光刚好落在床边。',short:'白天'},{id:'night',name:'暖灯夜晚',desc:'灯亮起来，窗外慢慢安静。',short:'夜晚'},{id:'work',name:'窗边工作角',desc:'整理想法，或者什么也不做。',short:'工作角'}];
+const rooms=[
+{id:'day',name:'晴日卧室',desc:'窗边有暖暖的阳光，床铺和花束都在等你。',short:'白天',icon:'☀️',hero:'阳光落在窗台，故事可以慢慢写。',note:'今日份柔软：晒过太阳的被子'},
+{id:'night',name:'星灯夜晚',desc:'深蓝色的夜晚，留一盏温柔的小灯。',short:'夜晚',icon:'🌙',hero:'灯光亮起来，今天也值得好好休息。',note:'把白天的疲惫留在门外'},
+{id:'work',name:'窗边工作角',desc:'书架、绿植与一杯热饮，陪你整理灵感。',short:'工作角',icon:'📚',hero:'在窗边写一点计划，也可以发一会儿呆。',note:'不赶时间，也能慢慢前进'},
+{id:'rain',name:'雨声小屋',desc:'蓝灰色的雨天氛围，适合听雨和读书。',short:'雨天',icon:'☔',hero:'窗外是想象中的雨声，屋里有安静的光。',note:'这是手动选择的雨天主题'}
+];
 const moods={sleepy:{name:'困困',speech:'姐姐，再让我眯一小会儿 ♡'},happy:{name:'开心',speech:'今天也要开心一点哦 ♡'},calm:{name:'安静',speech:'不着急，我们慢慢来。'},cheer:{name:'打气',speech:'姐姐，今天也很厉害！ ✦'}};
 const categories={memory:'记忆档案',project:'项目记录',thought:'观点收藏',life:'生活记录'};
 const sampleMemories=[{id:'m-start',title:'eli 的小家 · 设计方向确认',date:'2026-10-14',category:'project',body:'确定采用温柔的莫兰迪蓝色与奶油色。首页主图只展示一个家的背景，不堆叠人物。小家包含房间、2D 虚拟形象、衣柜、日记与时光博物馆。',source:'本次对话 · 用户确认的设计方向',createdAt:'2026-10-14T00:00:00.000Z'},{id:'m-build',title:'第一版开始开发',date:'2026-10-14',category:'project',body:'开始制作可实际操作的静态网页 MVP。私人日记与档案只在本机浏览器保存，不自动同步或公开。',source:'本次对话 · 用户授权开始开发',createdAt:'2026-10-14T00:00:01.000Z'}];
@@ -17,7 +22,12 @@ let life={healthUrl:'https://script.google.com/macros/s/AKfycbyb_vAIWn4ipc2sWVKA
 try{const x=JSON.parse(localStorage.getItem(LIFE_KEY));if(x&&typeof x==='object'){life={healthUrl:typeof x.healthUrl==='string'&&x.healthUrl?x.healthUrl:life.healthUrl,ledgerUrl:typeof x.ledgerUrl==='string'&&x.ledgerUrl?x.ledgerUrl:life.ledgerUrl,intake:x.intake&&typeof x.intake==='object'?x.intake:{}}}}catch(e){}
 function saveLife(){try{localStorage.setItem(LIFE_KEY,JSON.stringify(life));return true}catch(e){toast('保存失败，请检查浏览器存储');return false}}
 function validUrl(v){if(!v)return true;try{const u=new URL(v);return u.protocol==='https:'}catch(e){return false}}
-function renderLife(){const date=chinaDate();$('intakeDate').textContent=date+' · 今日摄入';const v=life.intake[date];$('intakeValue').innerHTML=v&&Number.isFinite(v.calories)?`${v.calories} <small>kcal</small>`:'未记录';$('intakeStatus').textContent=v&&Number.isFinite(v.calories)?(v.completeness==='complete'?'本机记录 · 已确认全天':'本机记录 · 仅已记录，未确认全天'):'尚无今日摄入记录 · 不等于 0 kcal';$('ledgerStatus').textContent=life.ledgerUrl?'已绑定记账网站，点击即可前往。':'记账网站尚未绑定网址，可在生活中心设置。';$('hubIntakeInfo').textContent=`${date} · ${v&&Number.isFinite(v.calories)?v.calories+' kcal':'未记录'} · ${v?(v.completeness==='complete'?'已确认全天':'仅已记录'):'无记录'}`;$('intakeInputDate').value=$('intakeInputDate').value||date;$('healthUrl').value=life.healthUrl;$('ledgerUrl').value=life.ledgerUrl;}
+function renderLife(){const date=chinaDate();$('intakeDate').textContent=date+' · 今日摄入';const v=life.intake[date];$('intakeValue').innerHTML=v&&Number.isFinite(v.calories)?`${v.calories} <small>kcal</small>`:'未记录';$('intakeStatus').textContent=v&&Number.isFinite(v.calories)?(v.completeness==='complete'?'本机记录 · 已确认全天':'本机记录 · 仅已记录，未确认全天'):'尚无今日摄入记录 · 不等于 0 kcal';$('ledgerStatus').textContent=life.ledgerUrl?'已绑定记账网站，点击即可前往。':'记账网站尚未绑定网址，可在生活中心设置。';$('hubIntakeInfo').textContent=`${date} · ${v&&Number.isFinite(v.calories)?v.calories+' kcal':'未记录'} · ${v?(v.completeness==='complete'?'已确认全天':'仅已记录'):'无记录'}`;$('intakeInputDate').value=$('intakeInputDate').value||date;$('healthUrl').value=life.healthUrl;$('ledgerUrl').value=life.ledgerUrl;renderDataStatus();}
+function renderDataStatus(){
+  const el=$('dataStatus');if(!el)return;
+  const days=Object.keys(life.intake).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).length;
+  el.textContent='本机已有 '+state.diaries.length+' 篇日记、'+state.memories.length+' 件藏品、'+days+' 天手动摄入记录。房间、服装、表情和两个网站入口也会随备份导出。所有私人数据仅保存在当前浏览器。';
+}
 function loadIntakeDay(){const v=life.intake[$('intakeInputDate').value];$('intakeCalories').value=v&&Number.isFinite(v.calories)?String(v.calories):'';$('intakeCompleteness').value=v?.completeness==='complete'?'complete':'partial'}
 function openLink(url){window.open(url,'_blank','noopener,noreferrer')}
 
@@ -60,11 +70,24 @@ function renderOutfits(){
   $('paletteDots').innerHTML=outfits.map(o=>'<button data-outfit="'+o.id+'" style="background:'+o.color+'" aria-label="'+o.name+'" title="'+o.name+'" aria-pressed="'+String(state.outfit===o.id)+'"></button>').join('');
   $('outfitSelections').innerHTML=outfits.map(o=>'<button class="outfit-card '+(state.outfit===o.id?'selected':'')+'" data-outfit="'+o.id+'" aria-pressed="'+String(state.outfit===o.id)+'">'+thumb(o)+'<span>'+o.name+'</span></button>').join('');
 }
-function renderRooms(){const r=rooms.find(r=>r.id===state.room)||rooms[0];$('roomArt').className=`room-art ${r.id}`;$('roomLabel').textContent=r.name;$('roomDescription').textContent=r.desc;$('roomSelections').innerHTML=rooms.map(o=>`<button class="selection-card ${o.id===state.room?'selected':''}" data-room="${o.id}"><strong>${o.name}</strong><span>${o.desc}</span></button>`).join('');$('roomThumbs').innerHTML=rooms.map(o=>`<button class="room-thumb" data-room="${o.id}" data-go="rooms"><div class="room-mini"></div>${o.short}</button>`).join('')}
+function renderRooms(){
+  const r=rooms.find(x=>x.id===state.room)||rooms[0];
+  $('roomArt').className='room-art '+r.id;
+  $('hero').dataset.scene=r.id;
+  $('heroTagline').textContent=r.hero;
+  $('roomLabel').textContent=r.name;
+  $('roomDescription').textContent=r.desc;
+  $('roomAmbienceIcon').textContent=r.icon;
+  $('roomAmbienceTitle').textContent=r.name;
+  $('roomNote').textContent=r.note;
+  $('roomSelections').innerHTML=rooms.map(o=>'<button class="selection-card '+(o.id===r.id?'selected':'')+'" data-room="'+o.id+'" aria-pressed="'+String(o.id===r.id)+'"><span class="scene-preview" aria-hidden="true"></span><strong>'+o.icon+' '+o.name+'</strong><span>'+o.desc+'</span></button>').join('');
+  $('roomThumbs').innerHTML=rooms.map(o=>'<button class="room-thumb '+(o.id===r.id?'selected':'')+'" data-room="'+o.id+'" data-go="rooms" aria-label="切换到'+o.name+'" aria-pressed="'+String(o.id===r.id)+'"><div class="room-mini"></div>'+o.short+'</button>').join('');
+  $('heroSceneStrip').innerHTML='<span class="scene-strip-label">给小家换个氛围</span>'+rooms.map(o=>'<button class="scene-chip '+(o.id===r.id?'selected':'')+'" data-room="'+o.id+'" aria-pressed="'+String(o.id===r.id)+'"><span aria-hidden="true">'+o.icon+'</span>'+o.short+'</button>').join('');
+}
 function renderMuseum(){const q=$('museumSearch').value.trim().toLowerCase();const f=$('museumFilter').value;const items=[...state.memories].filter(x=>(f==='all'||x.category===f)&&[x.title,x.body,x.source].some(s=>s.toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));$('museumCount').textContent=`已收藏 ${state.memories.length} 件藏品，全部保存在本机。`;$('museumList').innerHTML=items.length?items.map(x=>`<article class="entry-card"><div class="entry-top"><span class="entry-date">${esc(displayDate(x.date))}</span><span class="entry-tag">${esc(categories[x.category])}</span></div><h3>${esc(x.title)}</h3><p class="entry-body">${esc(x.body)}</p><div class="entry-source">来源：${esc(x.source||'未填写')}</div><div class="entry-actions"><button data-edit="memory" data-id="${esc(x.id)}">编辑</button><button data-delete="memory" data-id="${esc(x.id)}">删除</button></div></article>`).join(''):'<div class="empty-state"><span>📚</span>没有找到藏品。可以从一段真实的记录开始。</div>'}
 function renderDiaries(){const q=$('diarySearch').value.trim().toLowerCase();const items=[...state.diaries].filter(x=>[x.title,x.body].some(s=>s.toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));$('diaryList').innerHTML=items.length?items.map(x=>`<article class="entry-card"><div class="entry-top"><span class="entry-date">${esc(displayDate(x.date))}</span><span class="entry-tag">私人日记</span></div><h3>${esc(x.title)}</h3><p class="entry-body">${esc(x.body)}</p><div class="entry-actions"><button data-edit="diary" data-id="${esc(x.id)}">编辑</button><button data-delete="diary" data-id="${esc(x.id)}">删除</button></div></article>`).join(''):'<div class="empty-state"><span>✍️</span>日记本还是空白的。第一篇，等你想写的时候再写。</div>';
 const latest=[...state.diaries].sort((a,b)=>b.date.localeCompare(a.date))[0];$('diaryPreview').innerHTML=latest?`<strong>${esc(displayDate(latest.date))} · ${esc(latest.title)}</strong><span>${esc(latest.body.slice(0,125))}${latest.body.length>125?'…':''}</span>`:'<strong>空白的第一页 ☁️</strong><span>今天还没有日记。<br>这里不会自动编造你的生活。</span>'}
-function render(){renderLife();renderAvatar();renderOutfits();renderRooms();renderMuseum();renderDiaries();$('dateText').textContent=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'long',day:'numeric',weekday:'long'}).format(new Date())}
+function render(){renderLife();renderAvatar();renderOutfits();renderRooms();renderMuseum();renderDiaries();renderDataStatus();$('dateText').textContent=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'long',day:'numeric',weekday:'long'}).format(new Date())}
 function navigate(p){if(!$('page-'+p))return;page=p;all('.page').forEach(el=>el.classList.toggle('active',el.id==='page-'+p));all('.nav-link').forEach(el=>el.classList.toggle('active',el.dataset.page===p));$('pageCrumb').textContent=({home:'小家的首页',rooms:'我的房间',wardrobe:'eli 的衣柜',museum:'时光博物馆',diary:'日记本',hub:'生活中心',settings:'设置与备份'})[p];document.querySelector('.sidebar').classList.remove('open');window.scrollTo({top:0,behavior:'instant'});if(p==='museum')renderMuseum();if(p==='diary')renderDiaries()}
 function openDialog(type,id){const entry=id?(type==='diary'?state.diaries:state.memories).find(x=>x.id===id):null;$('dialogTitle').textContent=`${entry?'编辑':'新建'}${type==='diary'?'日记':'博物馆藏品'}`;$('entryType').value=type;$('entryId').value=entry?.id||'';$('entryTitle').value=entry?.title||'';$('entryDate').value=entry?.date||chinaDate();$('entryBody').value=entry?.body||'';$('entryCategory').value=entry?.category||'memory';$('entrySource').value=entry?.source||'';$('categoryField').hidden=type==='diary';$('sourceField').hidden=type==='diary';$('overlay').hidden=false;$('entryTitle').focus()}
 function closeDialog(){$('overlay').hidden=true}
@@ -90,6 +113,7 @@ $('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))closeDialog
 $('entryForm').addEventListener('submit',saveEntry);$('museumSearch').addEventListener('input',renderMuseum);$('museumFilter').addEventListener('change',renderMuseum);$('diarySearch').addEventListener('input',renderDiaries);
 $('exportBtn').addEventListener('click',exportData);$('importFile').addEventListener('change',e=>importData(e.target.files?.[0]));$('resetBtn').addEventListener('click',()=>{if(!confirm('确定清空本机的所有日记、藏品与装扮记录吗？此操作无法撤销，建议先导出备份。'))return;state={...defaultState(),memories:[]};if(save()){render();toast('本机记录已清空')}});
 render();loadIntakeDay();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){renderLife();$('dateText').textContent=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'long',day:'numeric',weekday:'long'}).format(new Date())}});
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || ['localhost','127.0.0.1'].includes(location.hostname))) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
