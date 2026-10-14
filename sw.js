@@ -1,6 +1,16 @@
 // Cache app shell for offline use; network first so GitHub Pages updates propagate.
-const CACHE = 'eli-home-v7';
-const ASSETS = ['./', './index.html', './styles.css?v=0.5', './v04.css?v=0.5', './v05.css?v=0.5', './v06.css?v=0.6', './v07.css?v=0.7', './app.js?v=0.7', './manifest.webmanifest', './assets/illustrations/mood-sleepy.webp', './assets/illustrations/mood-happy.webp', './assets/illustrations/mood-calm.webp', './assets/illustrations/mood-cheer.webp', './assets/illustrations/outfit-charcoal.webp', './assets/illustrations/outfit-cream.webp', './assets/illustrations/outfit-mist.webp', './assets/illustrations/outfit-white.webp', './assets/illustrations/outfit-rose.webp', './assets/illustrations/outfit-sage.webp'];
+const CACHE = 'eli-home-v8';
+const ASSETS = [
+  './', './index.html', './styles.css?v=0.8', './v04.css?v=0.5',
+  './v07.css?v=0.7', './v08.css?v=0.8', './app.js?v=0.8',
+  './manifest.webmanifest',
+  './assets/rooms/sunlit-bedroom.webp', './assets/rooms/window-workspace.webp',
+  './assets/illustrations/mood-sleepy.webp', './assets/illustrations/mood-happy.webp',
+  './assets/illustrations/mood-calm.webp', './assets/illustrations/mood-cheer.webp',
+  './assets/illustrations/outfit-charcoal.webp', './assets/illustrations/outfit-cream.webp',
+  './assets/illustrations/outfit-mist.webp', './assets/illustrations/outfit-white.webp',
+  './assets/illustrations/outfit-rose.webp', './assets/illustrations/outfit-sage.webp'
+];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
