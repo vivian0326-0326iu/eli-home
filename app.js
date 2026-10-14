@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 const STORAGE='eli-home-mvp-v1'; // Stable key: upgrades must not erase existing local records.
-const outfits=[{id:'charcoal',name:'炭灰卫衣',color:'#454750',accent:'#33353c',desc:'宽松的炭灰卫衣，像刚刚起床。'},{id:'cream',name:'奶油毛衣',color:'#e9ddd0',accent:'#c6b8a8',desc:'软乎乎的奶油毛衣，适合慢悠悠的一天。'},{id:'mist',name:'雾蓝外套',color:'#9fb8d3',accent:'#708fae',desc:'雾蓝色的小外套，和小家的颜色很搭。'},{id:'sage',name:'休闲针织',color:'#aabfae',accent:'#7b9d8a',desc:'一件安静的绿色上衣。'},{id:'rose',name:'针织开衫',color:'#cdaeb5',accent:'#aa8893',desc:'一点点粉色，刚刚好。'},{id:'white',name:'白色衬衫',color:'#f3f3f0',accent:'#bfc7cd',desc:'今天是清清爽爽的白衬衫。'}];
+const outfits=[{id:'charcoal',name:'宽松卫衣',color:'#454750',accent:'#33353c',desc:'有帽绳和大口袋的宽松卫衣。'},{id:'cream',name:'柔软毛衣',color:'#e9ddd0',accent:'#c6b8a8',desc:'柔软圆领毛衣，带细密的罗纹。'},{id:'mist',name:'轻薄外套',color:'#9fb8d3',accent:'#708fae',desc:'有拉链和翻领的轻薄外套。'},{id:'sage',name:'绞花针织衫',color:'#aabfae',accent:'#7b9d8a',desc:'有绞花纹理的针织衫。'},{id:'rose',name:'针织开衫',color:'#cdaeb5',accent:'#aa8893',desc:'敞开式针织开衫，内搭浅色上衣。'},{id:'white',name:'翻领衬衫',color:'#f3f3f0',accent:'#bfc7cd',desc:'带翻领与纽扣的清爽衬衫。'}];
 const colors=[
 {id:'charcoal',name:'炭灰',value:'#454750',line:'#292c34'},
 {id:'cream',name:'奶油',value:'#e9ddd0',line:'#bba995'},
