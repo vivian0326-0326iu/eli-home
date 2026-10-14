@@ -2,7 +2,7 @@
 'use strict';
 const STORAGE='eli-home-mvp-v1'; // Stable key: upgrades must not erase existing local records.
 const CHOICE_KEYS={look:'eli-choice-look-v1',mood:'eli-choice-mood-v1'};
-// Each source illustration is a complete image, so its garment style and color are one truthful choice.
+// A look ID selects one complete source image; color stays tied to that image until real layers exist.
 const looks=[
  {id:'charcoal',name:'宽松卫衣',colorName:'炭灰',desc:'炭灰色宽松卫衣原画。'},
  {id:'cream',name:'柔软毛衣',colorName:'奶油',desc:'奶油色罗纹毛衣原画。'},
