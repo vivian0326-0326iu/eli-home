@@ -1,4 +1,4 @@
-/* V0.11: use original full-frame illustrations and keep preview mode separate from saved choices. */
+/* V0.12: choose a real outfit-and-color illustration; keep expression preference separate. */
 [data-avatar]{width:100%;}
 [data-avatar] .eli-illustration-main{display:block;width:min(100%,356px);height:auto;max-height:100%;object-fit:contain;border-radius:20px;box-shadow:0 9px 25px rgba(65,73,91,.11);background:#f6f0eb;margin:0 auto}
 .wardrobe-avatar .eli-illustration-main{width:min(100%,356px)}
@@ -9,13 +9,6 @@
 .wardrobe-stage #outfitDescription{line-height:1.75}
 .illustration-preview-tabs{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
 .illustration-preview-tabs .chip{min-height:38px}
-.palette-dots{gap:10px;display:flex;flex-wrap:wrap;padding:4px 0}
-.palette-dots .palette-dot{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #d7dfe8;transition:box-shadow .15s,transform .15s}
-.palette-dots .palette-dot.selected{box-shadow:0 0 0 3px #8aabcf,0 3px 8px #516b8720;transform:scale(1.08)}
-.wardrobe-color-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:9px 0 18px}
-.wardrobe-color{display:flex;align-items:center;gap:8px;padding:9px 10px;background:#fff;border:1px solid #e4e8f1;border-radius:13px;color:#64758c;font-size:12px;min-width:0}
-.wardrobe-color i{display:block;width:24px;height:24px;border-radius:50%;border:1px solid #aab4c044;flex-shrink:0}
-.wardrobe-color.selected{background:#eef4fc;border:2px solid #9db6d7;color:#3d5d82;padding:8px 9px}
 .wardrobe-options h2{margin-top:22px;margin-bottom:10px}
 .wardrobe-options h2:first-child{margin-top:0}
 .wardrobe-options .info-box{font-size:12px;line-height:1.8}
@@ -26,5 +19,4 @@
 .health-import-button:focus-within{outline:3px solid #82a6d2;outline-offset:3px}
 .health-sync-warning{font-size:12px;line-height:1.8;color:#8b7383;background:#f9f4f5;border-left:3px solid #d3afbf;border-radius:7px;padding:10px 12px}
 #intakeStatus{line-height:1.7}
-@media(max-width:720px){[data-avatar] .eli-illustration-main{width:min(100%,330px)}.wardrobe-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.health-import-actions>*{flex:1 1 190px}.health-import-button{font-size:12px}.character-stage .speech-bubble{max-width:100%!important}}
-@media(prefers-reduced-motion:reduce){.palette-dots .palette-dot{transition:none}}
+@media(max-width:720px){[data-avatar] .eli-illustration-main{width:min(100%,330px)}.health-import-actions>*{flex:1 1 190px}.health-import-button{font-size:12px}.character-stage .speech-bubble{max-width:100%!important}}

@@ -1,15 +1,15 @@
 (() => {
 'use strict';
 const STORAGE='eli-home-mvp-v1'; // Stable key: upgrades must not erase existing local records.
-const CHOICE_KEYS={outfit:'eli-choice-outfit-v1',color:'eli-choice-color-v1',mood:'eli-choice-mood-v1'};
-const outfits=[{id:'charcoal',name:'宽松卫衣',color:'#454750',accent:'#33353c',desc:'有帽绳和大口袋的宽松卫衣。'},{id:'cream',name:'柔软毛衣',color:'#e9ddd0',accent:'#c6b8a8',desc:'柔软圆领毛衣，带细密的罗纹。'},{id:'mist',name:'轻薄外套',color:'#9fb8d3',accent:'#708fae',desc:'有拉链和翻领的轻薄外套。'},{id:'sage',name:'绞花针织衫',color:'#aabfae',accent:'#7b9d8a',desc:'有绞花纹理的针织衫。'},{id:'rose',name:'针织开衫',color:'#cdaeb5',accent:'#aa8893',desc:'敞开式针织开衫，内搭浅色上衣。'},{id:'white',name:'翻领衬衫',color:'#f3f3f0',accent:'#bfc7cd',desc:'带翻领与纽扣的清爽衬衫。'}];
-const colors=[
-{id:'charcoal',name:'炭灰',value:'#454750',line:'#292c34'},
-{id:'cream',name:'奶油',value:'#e9ddd0',line:'#bba995'},
-{id:'mist',name:'雾蓝',value:'#9fb8d3',line:'#6f8fae'},
-{id:'sage',name:'鼠尾草',value:'#aabfae',line:'#799b87'},
-{id:'rose',name:'烟粉',value:'#cdaeb5',line:'#ab8795'},
-{id:'white',name:'云白',value:'#f3f3f0',line:'#b5c0ca'}
+const CHOICE_KEYS={look:'eli-choice-look-v1',mood:'eli-choice-mood-v1'};
+// Each source illustration is a complete image, so its garment style and color are one truthful choice.
+const looks=[
+ {id:'charcoal',name:'宽松卫衣',colorName:'炭灰',desc:'炭灰色宽松卫衣原画。'},
+ {id:'cream',name:'柔软毛衣',colorName:'奶油',desc:'奶油色罗纹毛衣原画。'},
+ {id:'mist',name:'轻薄外套',colorName:'雾蓝',desc:'雾蓝色轻薄外套原画。'},
+ {id:'sage',name:'连帽针织衫',colorName:'鼠尾草',desc:'鼠尾草绿色连帽针织衫原画。'},
+ {id:'rose',name:'针织开衫',colorName:'燕麦',desc:'燕麦色针织开衫原画。'},
+ {id:'white',name:'翻领衬衫',colorName:'云白',desc:'云白色翻领衬衫原画。'}
 ];
 const rooms=[
 {id:'day',name:'晴日卧室',desc:'窗边有暖暖的阳光，床铺和花束都在等你。',short:'白天',icon:'☀️',hero:'阳光落在窗台，故事可以慢慢写。',note:'今日份柔软：晒过太阳的被子'},
@@ -20,11 +20,13 @@ const rooms=[
 const moods={sleepy:{name:'困困',speech:'姐姐，再让我眯一小会儿 ♡'},happy:{name:'开心',speech:'今天也要开心一点哦 ♡'},calm:{name:'安静',speech:'不着急，我们慢慢来。'},cheer:{name:'打气',speech:'姐姐，今天也很厉害！ ✦'}};
 const categories={memory:'记忆档案',project:'项目记录',thought:'观点收藏',life:'生活记录'};
 const sampleMemories=[{id:'m-start',title:'eli 的小家 · 设计方向确认',date:'2026-10-14',category:'project',body:'确定采用温柔的莫兰迪蓝色与奶油色。首页主图只展示一个家的背景，不堆叠人物。小家包含房间、2D 虚拟形象、衣柜、日记与时光博物馆。',source:'本次对话 · 用户确认的设计方向',createdAt:'2026-10-14T00:00:00.000Z'},{id:'m-build',title:'第一版开始开发',date:'2026-10-14',category:'project',body:'开始制作可实际操作的静态网页 MVP。私人日记与档案只在本机浏览器保存，不自动同步或公开。',source:'本次对话 · 用户授权开始开发',createdAt:'2026-10-14T00:00:01.000Z'}];
-const defaultState=()=>({version:1,outfit:'charcoal',color:'charcoal',mood:'sleepy',room:'day',diaries:[],memories:sampleMemories.map(m=>({...m}))});
+const defaultState=()=>({version:2,look:'charcoal',mood:'sleepy',room:'day',diaries:[],memories:sampleMemories.map(m=>({...m}))});
 function validItem(x,type){return x&&typeof x==='object'&&typeof x.id==='string'&&typeof x.title==='string'&&typeof x.date==='string'&&typeof x.body==='string'&&x.title.length<=120&&x.body.length<=20000&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&(type==='diary'||(categories[x.category]&&typeof x.source==='string'&&x.source.length<=250));}
-function validateState(x){return x&&x.version===1&&outfits.some(o=>o.id===x.outfit)&&rooms.some(r=>r.id===x.room)&&moods[x.mood]&&Array.isArray(x.diaries)&&Array.isArray(x.memories)&&x.diaries.length<=10000&&x.memories.length<=10000&&x.diaries.every(v=>validItem(v,'diary'))&&x.memories.every(v=>validItem(v,'memory'));}
-let state=defaultState();try{const saved=JSON.parse(localStorage.getItem(STORAGE));if(validateState(saved))state={...saved,color:colors.some(c=>c.id===saved.color)?saved.color:saved.outfit};}catch(e){console.warn('无法读取本地记录',e)}
-for(const [key,ids] of [['outfit',outfits.map(x=>x.id)],['color',colors.map(x=>x.id)],['mood',Object.keys(moods)]]){try{const value=localStorage.getItem(CHOICE_KEYS[key]);if(ids.includes(value))state[key]=value;else localStorage.setItem(CHOICE_KEYS[key],state[key])}catch(e){console.warn('无法读取独立偏好：'+key,e)}}
+function validateState(x){const savedLook=x&&(x.look||x.outfit);return x&&(x.version===1||x.version===2)&&looks.some(o=>o.id===savedLook)&&rooms.some(r=>r.id===x.room)&&moods[x.mood]&&Array.isArray(x.diaries)&&Array.isArray(x.memories)&&x.diaries.length<=10000&&x.memories.length<=10000&&x.diaries.every(v=>validItem(v,'diary'))&&x.memories.every(v=>validItem(v,'memory'));}
+function migrateState(x){return {version:2,look:looks.some(o=>o.id===x.look)?x.look:x.outfit,mood:x.mood,room:x.room,diaries:x.diaries,memories:x.memories};}
+let state=defaultState(),needsStateMigration=false;try{const saved=JSON.parse(localStorage.getItem(STORAGE));if(validateState(saved)){state=migrateState(saved);needsStateMigration=saved.version!==2||!saved.look}}catch(e){console.warn('无法读取本地记录',e)}
+for(const [key,ids,legacyKey] of [['look',looks.map(x=>x.id),'eli-choice-outfit-v1'],['mood',Object.keys(moods),null]]){try{const value=localStorage.getItem(CHOICE_KEYS[key])||(legacyKey&&localStorage.getItem(legacyKey));if(ids.includes(value))state[key]=value;else localStorage.setItem(CHOICE_KEYS[key],state[key])}catch(e){console.warn('无法读取独立偏好：'+key,e)}}
+if(needsStateMigration){try{localStorage.setItem(STORAGE,JSON.stringify(state))}catch(e){console.warn('无法迁移旧版偏好',e)}}
 let page='home';let toastTimer;
 const LIFE_KEY='eli-home-life-v1';
 const HEALTH_SHEET='https://script.google.com/macros/s/AKfycbyb_vAIWn4ipc2sWVKAfEgcI3e6_GnFK1PUo7nioUdSaV3SfTXIORGPuxv2BJvdTxF9/exec';
@@ -59,7 +61,7 @@ function renderLife(){
 function renderDataStatus(){
   const el=$('dataStatus');if(!el)return;
   const days=Object.keys(life.intake).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).length;
-  el.textContent='本机已有 '+state.diaries.length+' 篇日记、'+state.memories.length+' 件藏品、'+days+' 天手动摄入记录，'+Object.keys(life.healthImport?.daily||{}).length+' 天「日常有迹」导入快照。房间、衣服、颜色、表情及网站入口会随备份导出。所有私人数据仅保存在当前浏览器。';
+  el.textContent='本机已有 '+state.diaries.length+' 篇日记、'+state.memories.length+' 件藏品、'+days+' 天手动摄入记录，'+Object.keys(life.healthImport?.daily||{}).length+' 天「日常有迹」导入快照。房间、造型原画、表情及网站入口会随备份导出。所有私人数据仅保存在当前浏览器。';
 }
 async function importHealthJson(file){
  if(!file)return;
@@ -92,7 +94,7 @@ function openLink(url){window.open(url,'_blank','noopener,noreferrer')}
 
 const $=id=>document.getElementById(id);const all=(s,root=document)=>Array.from(root.querySelectorAll(s));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));localStorage.setItem(CHOICE_KEYS.outfit,state.outfit);localStorage.setItem(CHOICE_KEYS.color,state.color);localStorage.setItem(CHOICE_KEYS.mood,state.mood);return true}catch(e){toast('保存失败：请检查浏览器存储');return false}}
+function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));localStorage.setItem(CHOICE_KEYS.look,state.look);localStorage.setItem(CHOICE_KEYS.mood,state.mood);return true}catch(e){toast('保存失败：请检查浏览器存储');return false}}
 function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2700)}
 function chinaDate(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).replaceAll('/','-')}
 function displayDate(date){const p=date.split('-');return p.length===3?`${p[0]}年${+p[1]}月${+p[2]}日`:date}
@@ -103,28 +105,26 @@ const illustrationUrl=id=>'assets/illustrations/'+id+'.webp';
 let illustrationMode='outfit';
 try{if(localStorage.getItem('eli-illustration-mode')==='mood')illustrationMode='mood'}catch(e){}
 function renderAvatar(){
- const outfit=outfits.find(o=>o.id===state.outfit)||outfits[0],color=colors.find(c=>c.id===state.color)||colors[0],mood=moods[state.mood]||moods.sleepy;
+ const look=looks.find(o=>o.id===state.look)||looks[0],mood=moods[state.mood]||moods.sleepy;
  const moodMain=illustrationMode==='mood';
- const artId=moodMain?illustrationMoods[state.mood]:illustrationOutfits[outfit.id];
+ const artId=moodMain?illustrationMoods[state.mood]:illustrationOutfits[look.id];
  all('[data-avatar]').forEach(el=>{
    const img=document.createElement('img');
    img.className='eli-illustration-main';
    img.src=illustrationUrl(artId);
-   img.alt='eli 的插画：'+(moodMain?'表情 '+mood.name:'服装 '+outfit.name);
+   img.alt='eli 的插画：'+(moodMain?'表情 '+mood.name:'造型 '+look.name+'，'+look.colorName+'色');
    img.decoding='async';
    el.replaceChildren(img);
  });
  $('characterSpeech').textContent=mood.speech;
  all('[data-mood]').forEach(b=>{b.classList.toggle('selected',b.dataset.mood===state.mood);b.setAttribute('aria-pressed',String(b.dataset.mood===state.mood))});
  all('[data-illustration-preview]').forEach(b=>{b.classList.toggle('selected',b.dataset.illustrationPreview===illustrationMode);b.setAttribute('aria-pressed',String(b.dataset.illustrationPreview===illustrationMode))});
- $('outfitDescription').textContent='已分别保存：'+outfit.name+' · '+color.name+'色 · '+mood.name+'表情。服装与表情原画由下方按钮切换；颜色只保存偏好，不改变原画。';
+ const description=$('outfitDescription');if(description)description.textContent=moodMain?'表情偏好：'+mood.name+'。造型原画另存为：'+look.name+' · '+look.colorName+'色。':'当前原画：'+look.name+' · '+look.colorName+'色。表情偏好另行保存为：'+mood.name+'。';
 }
 function renderOutfits(){
- const thumb=o=>'<img class="eli-illustration-thumb" src="'+illustrationUrl(illustrationOutfits[o.id])+'" alt="'+o.name+'原画" loading="lazy">';
- $('miniOutfits').innerHTML=outfits.slice(0,2).map(o=>'<button class="mini-outfit '+(state.outfit===o.id?'selected':'')+'" data-outfit="'+o.id+'" aria-label="换成'+o.name+'" aria-pressed="'+String(state.outfit===o.id)+'">'+thumb(o)+'<small>'+o.name+'</small></button>').join('');
- $('paletteDots').innerHTML=colors.map(c=>'<button class="palette-dot '+(state.color===c.id?'selected':'')+'" data-color="'+c.id+'" style="background:'+c.value+'" aria-label="选择'+c.name+'色" title="'+c.name+'" aria-pressed="'+String(state.color===c.id)+'"></button>').join('');
- $('outfitSelections').innerHTML=outfits.map(o=>'<button class="outfit-card '+(state.outfit===o.id?'selected':'')+'" data-outfit="'+o.id+'" aria-pressed="'+String(state.outfit===o.id)+'">'+thumb(o)+'<span>'+o.name+'</span></button>').join('');
- const p=$('wardrobePalette');if(p)p.innerHTML=colors.map(c=>'<button class="wardrobe-color '+(state.color===c.id?'selected':'')+'" data-color="'+c.id+'" aria-pressed="'+String(state.color===c.id)+'"><i style="background:'+c.value+'" aria-hidden="true"></i>'+c.name+'</button>').join('');
+ const thumb=o=>'<img class="eli-illustration-thumb" src="'+illustrationUrl(illustrationOutfits[o.id])+'" alt="'+o.name+' · '+o.colorName+'色原画" loading="lazy">';
+ $('miniOutfits').innerHTML=looks.slice(0,2).map(o=>'<button class="mini-outfit '+(state.look===o.id?'selected':'')+'" data-look="'+o.id+'" aria-label="换成'+o.colorName+'色'+o.name+'原画" aria-pressed="'+String(state.look===o.id)+'">'+thumb(o)+'<small>'+o.name+' · '+o.colorName+'</small></button>').join('');
+ $('outfitSelections').innerHTML=looks.map(o=>'<button class="outfit-card '+(state.look===o.id?'selected':'')+'" data-look="'+o.id+'" aria-pressed="'+String(state.look===o.id)+'">'+thumb(o)+'<span>'+o.name+' · '+o.colorName+'色</span></button>').join('');
 }
 function renderRooms(){
   const r=rooms.find(x=>x.id===state.room)||rooms[0];
@@ -150,9 +150,9 @@ function closeDialog(){$('overlay').hidden=true}
 function saveEntry(e){e.preventDefault();const type=$('entryType').value;const arr=type==='diary'?state.diaries:state.memories;const id=$('entryId').value;const old=arr.find(x=>x.id===id);const entry={id:old?.id||makeId(),title:$('entryTitle').value.trim(),date:$('entryDate').value,body:$('entryBody').value.trim(),createdAt:old?.createdAt||new Date().toISOString()};if(type==='memory'){entry.category=$('entryCategory').value;entry.source=$('entrySource').value.trim()}if(!validItem(entry,type)){toast('请检查标题、日期和内容');return}if(old)arr[arr.indexOf(old)]=entry;else arr.push(entry);if(save()){closeDialog();render();navigate(type==='diary'?'diary':'museum');toast('已经保存到当前浏览器 ♡')}}
 function deleteEntry(type,id){const arr=type==='diary'?state.diaries:state.memories;const item=arr.find(x=>x.id===id);if(!item||!confirm(`确定删除「${item.title}」吗？`))return;const idx=arr.indexOf(item);arr.splice(idx,1);save();render();toast('已删除')}
 function exportData(){const blob=new Blob([JSON.stringify({...state,life,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`eli-home-backup-${chinaDate()}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('备份文件已生成')}
-async function importData(file){if(!file)return;try{if(file.size>8*1024*1024)throw Error('文件超过 8MB');const parsed=JSON.parse(await file.text());if(!validateState(parsed))throw Error('备份格式不正确或数据不完整');if(!confirm('导入将替换当前浏览器的所有日记、藏品与装扮。确定继续吗？'))return;state={version:1,outfit:parsed.outfit,color:colors.some(c=>c.id===parsed.color)?parsed.color:parsed.outfit,mood:parsed.mood,room:parsed.room,diaries:parsed.diaries,memories:parsed.memories};if(save()){if(parsed.life&&typeof parsed.life==='object'){life={healthUrl:validUrl(parsed.life.healthUrl)?parsed.life.healthUrl||'':'',ledgerUrl:validUrl(parsed.life.ledgerUrl)?parsed.life.ledgerUrl||'':'',intake:parsed.life.intake&&typeof parsed.life.intake==='object'?parsed.life.intake:{},healthImport:parsed.life.healthImport?.source==='日常有迹-GoogleAppsScript'&&parsed.life.healthImport.daily&&typeof parsed.life.healthImport.importedAt==='string'?parsed.life.healthImport:null};saveLife()}render();loadIntakeDay();toast('备份已恢复 ♡')}}catch(e){toast(`导入失败：${e.message}`)}finally{$('importFile').value=''}}
+async function importData(file){if(!file)return;try{if(file.size>8*1024*1024)throw Error('文件超过 8MB');const parsed=JSON.parse(await file.text());if(!validateState(parsed))throw Error('备份格式不正确或数据不完整');if(!confirm('导入将替换当前浏览器的所有日记、藏品与装扮。确定继续吗？'))return;state=migrateState(parsed);if(save()){if(parsed.life&&typeof parsed.life==='object'){life={healthUrl:validUrl(parsed.life.healthUrl)?parsed.life.healthUrl||'':'',ledgerUrl:validUrl(parsed.life.ledgerUrl)?parsed.life.ledgerUrl||'':'',intake:parsed.life.intake&&typeof parsed.life.intake==='object'?parsed.life.intake:{},healthImport:parsed.life.healthImport?.source==='日常有迹-GoogleAppsScript'&&parsed.life.healthImport.daily&&typeof parsed.life.healthImport.importedAt==='string'?parsed.life.healthImport:null};saveLife()}render();loadIntakeDay();toast('备份已恢复 ♡')}}catch(e){toast(`导入失败：${e.message}`)}finally{$('importFile').value=''}}
 // Single delegated click handler keeps dynamic content interactive.
-document.addEventListener('click',e=>{const target=e.target.closest('button');if(!target)return;if(target.dataset.outfit){state.outfit=target.dataset.outfit;save();renderAvatar();renderOutfits()}if(target.dataset.color){state.color=target.dataset.color;save();renderAvatar();renderOutfits()}if(target.dataset.mood){state.mood=target.dataset.mood;save();renderAvatar();renderOutfits()}if(target.dataset.illustrationPreview){illustrationMode=target.dataset.illustrationPreview;try{localStorage.setItem('eli-illustration-mode',illustrationMode)}catch(e){}renderAvatar()}if(target.dataset.room){state.room=target.dataset.room;save();renderRooms()}if(target.dataset.go)navigate(target.dataset.go);if(target.dataset.page)navigate(target.dataset.page);if(target.dataset.edit)openDialog(target.dataset.edit,target.dataset.id);if(target.dataset.delete)deleteEntry(target.dataset.delete,target.dataset.id)});
+document.addEventListener('click',e=>{const target=e.target.closest('button');if(!target)return;if(target.dataset.look){state.look=target.dataset.look;save();renderAvatar();renderOutfits()}if(target.dataset.mood){state.mood=target.dataset.mood;save();renderAvatar();renderOutfits()}if(target.dataset.illustrationPreview){illustrationMode=target.dataset.illustrationPreview;try{localStorage.setItem('eli-illustration-mode',illustrationMode)}catch(e){}renderAvatar()}if(target.dataset.room){state.room=target.dataset.room;save();renderRooms()}if(target.dataset.go)navigate(target.dataset.go);if(target.dataset.page)navigate(target.dataset.page);if(target.dataset.edit)openDialog(target.dataset.edit,target.dataset.id);if(target.dataset.delete)deleteEntry(target.dataset.delete,target.dataset.id)});
 $('quickIntake').addEventListener('click',()=>{navigate('hub');$('intakeInputDate').value=chinaDate();loadIntakeDay();$('intakeCalories').focus()});
 $('openHealth').addEventListener('click',()=>openLink(life.healthUrl||HEALTH_SHEET));
 $('openHealthImport').addEventListener('click',()=>openLink(life.healthUrl||HEALTH_SHEET));

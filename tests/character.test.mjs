@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
-const outfits=['charcoal','cream','mist','sage','rose','white'];
+const looks=['charcoal','cream','mist','sage','rose','white'];
 const moods=['sleepy','happy','calm','cheer'];
-const ids=[...outfits.map(id=>'outfit-'+id),...moods.map(id=>'mood-'+id)];
+const ids=[...looks.map(id=>'outfit-'+id),...moods.map(id=>'mood-'+id)];
 for(const id of ids){
   const file='assets/illustrations/'+id+'.webp';
   const buf=fs.readFileSync(file);
@@ -13,25 +13,25 @@ for(const id of ids){
 const app=fs.readFileSync('app.js','utf8');
 const html=fs.readFileSync('index.html','utf8');
 const sw=fs.readFileSync('sw.js','utf8');
-for(const id of outfits)assert.ok(app.includes('outfit-'+id),'Missing outfit mapping: '+id);
+for(const id of looks)assert.ok(app.includes('outfit-'+id),'Missing outfit mapping: '+id);
 for(const id of moods)assert.ok(app.includes('mood-'+id),'Missing mood mapping: '+id);
-assert.ok(app.includes('data-outfit="'), 'Outfit selection must be available');
-assert.ok(app.includes('data-color="'), 'Color preference must be available');
+assert.ok(app.includes('data-look="'), 'Real illustration choice must be available');
 assert.ok(html.includes('data-mood="'), 'Expression selection must be available');
 assert.ok(app.includes('eli-illustration-main'), 'Main character must use an original image');
 assert.ok(!app.includes('avatarSvg('), 'SVG character rendering must be removed');
 assert.ok(!app.includes('eli-composed-svg'), 'SVG character preview must be removed');
 assert.ok(!app.includes('eli-art-reference'), 'Small original-art reference must be removed');
 assert.ok(app.includes('illustrationMode'), 'Image display mode must be explicit');
-for(const id of ['charcoal','cream','mist','sage','rose','white'])assert.ok(app.includes("id:'"+id+"'"),'Missing independent color '+id);
+for(const color of ['炭灰','奶油','雾蓝','鼠尾草','燕麦','云白'])assert.ok(app.includes("colorName:'"+color+"'"),'Missing visible source-art color '+color);
 assert.ok(!html.includes('<script src="character-v06.js'),'Old SVG character must not load');
-assert.ok(html.includes('app.js?v=0.11'));
-assert.ok(html.includes('v09.css?v=0.11'));
-assert.ok(html.includes('wardrobePalette'));
+assert.ok(html.includes('app.js?v=0.12'));
+assert.ok(html.includes('v09.css?v=0.12'));
+assert.ok(!html.includes('wardrobePalette'));
+assert.ok(!html.includes('paletteDots'));
 assert.ok(html.includes('data-illustration-preview="outfit"'));
 assert.ok(html.includes('data-illustration-preview="mood"'));
-assert.ok(app.includes("eli-choice-outfit-v1"));
-assert.ok(app.includes("eli-choice-color-v1"));
+assert.ok(app.includes("eli-choice-look-v1"));
+assert.ok(app.includes("eli-choice-outfit-v1"),'Previous saved outfit choice must be migrated');
 assert.ok(app.includes("eli-choice-mood-v1"));
 assert.ok(app.includes('target.dataset.illustrationPreview'));
 assert.ok(html.includes('healthImportFile'));
@@ -41,7 +41,7 @@ assert.ok(html.includes('v07.css?v=0.7'));
 assert.ok(html.includes('v08.css?v=0.8'));
 assert.ok(html.includes('heroSceneStrip'));
 assert.ok(html.includes('dataStatus'));
-assert.ok(sw.includes('eli-home-v11'));
+assert.ok(sw.includes('eli-home-v12'));
 for(const id of ['day','night','work','rain'])assert.ok(app.includes("id:'"+id+"'"),'Missing room '+id);
 for(const file of ['sunlit-bedroom.webp','window-workspace.webp']){
   const buf=fs.readFileSync('assets/rooms/'+file);
@@ -51,4 +51,4 @@ for(const file of ['sunlit-bedroom.webp','window-workspace.webp']){
 }
 assert.ok(app.includes('renderDataStatus()'));
 assert.ok(app.includes('heroTagline'));
-console.log('PASS: 10 original WebP illustrations, image-only character preview, independent saved preferences, and private health snapshot import.');
+console.log('PASS: 10 original WebP illustrations, image-only character preview, paired art-and-color choice, independent expression preference, and private health snapshot import.');
