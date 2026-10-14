@@ -1,0 +1,13 @@
+/* V0.5: real garment tint on the original portrait, not frame color. */
+.avatar-portrait{position:relative;isolation:isolate;overflow:hidden;border:0!important;outline:0!important;box-shadow:0 10px 28px #6b73811c}
+.avatar-portrait::before,.avatar-portrait::after{content:"";position:absolute;inset:0;pointer-events:none;background:var(--wear-color,#454750);mix-blend-mode:screen;opacity:var(--wear-opacity,.0)}
+.avatar-portrait::before{clip-path:polygon(86% 55%,100% 57%,100% 84%,93% 84%,85% 76%,84% 66%)}
+.avatar-portrait::after{clip-path:polygon(50% 75%,57% 74%,67% 75%,80% 74%,88% 73%,100% 81%,100% 85%,83% 86%,70% 84%,55% 84%,47% 81%)}
+.avatar-portrait[data-wear="charcoal"]{--wear-color:#454750;--wear-opacity:0}
+.avatar-portrait[data-wear="cream"]{--wear-color:#e9ddd0;--wear-opacity:.84}
+.avatar-portrait[data-wear="mist"]{--wear-color:#739fc9;--wear-opacity:.75}
+.avatar-portrait[data-wear="sage"]{--wear-color:#8db39b;--wear-opacity:.74}
+.avatar-portrait[data-wear="rose"]{--wear-color:#c795a8;--wear-opacity:.78}
+.avatar-portrait[data-wear="white"]{--wear-color:#f3f3f0;--wear-opacity:.9}
+.wardrobe-stage .avatar-portrait{width:min(100%,360px)}
+.outfit-card.selected{border-color:#8eabd4;background:#eef5ff}
