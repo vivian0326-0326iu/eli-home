@@ -28,7 +28,7 @@ assert.ok(html.includes('app.js?v=0.12'));
 assert.ok(html.includes('v09.css?v=0.12'));
 assert.ok(!html.includes('wardrobePalette'));
 assert.ok(!html.includes('paletteDots'));
-assert.ok(html.includes('data-illustration-preview="outfit"'));
+assert.ok(html.includes('data-illustration-preview="look"'));
 assert.ok(html.includes('data-illustration-preview="mood"'));
 assert.ok(app.includes("eli-choice-look-v1"));
 assert.ok(app.includes("eli-choice-outfit-v1"),'Previous saved outfit choice must be migrated');

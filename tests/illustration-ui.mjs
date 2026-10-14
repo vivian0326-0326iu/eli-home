@@ -99,6 +99,7 @@ await legacy.addInitScript(()=>{
   localStorage.setItem('eli-choice-outfit-v1','cream');
   localStorage.setItem('eli-choice-color-v1','mist');
   localStorage.setItem('eli-choice-mood-v1','calm');
+  localStorage.setItem('eli-illustration-mode','outfit');
 });
 await legacy.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
 assert.ok((await legacy.locator('.character-panel .eli-illustration-main').getAttribute('src')).includes('outfit-cream.webp'));
@@ -107,6 +108,7 @@ assert.equal(migrated.version,2);
 assert.equal(migrated.look,'cream');
 assert.equal(migrated.mood,'calm');
 assert.equal('color' in migrated,false);
+assert.equal(await legacy.evaluate(()=>localStorage.getItem('eli-illustration-mode')),'look');
 await legacy.close();
 await browser.close();
 console.log('PASS: image-only character, real image-based outfit/color choice, separately saved expression preference, persisted room, real health JSON import, manual override, backup and mobile viewport');
