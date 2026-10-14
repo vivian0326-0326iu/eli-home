@@ -3,10 +3,9 @@ on:
   push:
     branches: [main]
     paths:
-      - 'character-v06.js'
+      - 'assets/illustrations/**'
       - 'app.js'
-      - 'v06.css'
-      - 'tests/character.test.mjs'
+      - 'v07.css'
       - '.github/workflows/character-visual.yml'
   workflow_dispatch:
 jobs:
@@ -18,30 +17,23 @@ jobs:
         with:
           node-version: '22'
       - run: node tests/character.test.mjs
-      - name: Install rasterizer
-        run: python3 -m pip install --quiet --break-system-packages cairosvg pillow
-      - name: Render six mood/outfit previews
+      - name: Install Pillow
+        run: python3 -m pip install --quiet pillow
+      - name: Render ten actual illustrations
         run: |
           python3 - <<'PY'
-          import json, io, base64
           from PIL import Image, ImageDraw
-          import cairosvg
-          with open('character-fixtures.json') as f: svgs=json.load(f)
-          indices=[0,1,2,3,4,8]
-          labels=['charcoal sleepy','charcoal happy','charcoal calm','charcoal cheer','cream sleepy','mist sleepy']
-          board=Image.new('RGB',(3*350,2*380),'#f5f7fb')
-          draw=ImageDraw.Draw(board)
-          for i,(idx,label) in enumerate(zip(indices,labels)):
-              png=cairosvg.svg2png(bytestring=svgs[idx].encode(),output_width=340,output_height=340)
-              img=Image.open(io.BytesIO(png)).convert('RGB')
-              x=(i%3)*350+5;y=(i//3)*380+5
-              board.paste(img,(x,y))
-              draw.text((x+8,y+344),label,fill='#45536a')
-          buf=io.BytesIO();board.save(buf,format='JPEG',quality=78,optimize=True)
-          encoded=base64.b64encode(buf.getvalue()).decode()
-          print('VISUAL_START')
-          for i in range(0,len(encoded),6000):
-              print('VISUAL_PART:'+encoded[i:i+6000])
-          print('VISUAL_END')
-          print('Visual preview generated, bytes:',len(buf.getvalue()))
+          ids=['outfit-charcoal','outfit-cream','outfit-mist','outfit-white','outfit-rose','outfit-sage','mood-sleepy','mood-happy','mood-calm','mood-cheer']
+          sheet=Image.new('RGB',(5*220,2*255),'#f5f7fb')
+          d=ImageDraw.Draw(sheet)
+          for i,name in enumerate(ids):
+              img=Image.open('assets/illustrations/'+name+'.webp').convert('RGB').resize((208,208))
+              x=(i%5)*220+6;y=(i//5)*255+6
+              sheet.paste(img,(x,y));d.text((x,y+215),name,fill='#40516b')
+          sheet.save('illustrations-contact-sheet.png')
+          print('PASS: 10 actual illustrations rendered')
           PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eli-v07-illustrations
+          path: illustrations-contact-sheet.png
