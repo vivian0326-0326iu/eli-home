@@ -1,6 +1,6 @@
 // Cache app shell for offline use; network first so GitHub Pages updates propagate.
-const CACHE = 'eli-home-v5';
-const ASSETS = ['./', './index.html', './styles.css?v=0.5', './v04.css?v=0.5', './v05.css?v=0.5', './app.js?v=0.5', './manifest.webmanifest'];
+const CACHE = 'eli-home-v6';
+const ASSETS = ['./', './index.html', './styles.css?v=0.5', './v04.css?v=0.5', './v05.css?v=0.5', './character-v06.js?v=0.6', './v06.css?v=0.6', './app.js?v=0.6', './manifest.webmanifest'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
