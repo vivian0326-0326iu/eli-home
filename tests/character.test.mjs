@@ -19,7 +19,19 @@ assert.ok(app.includes("illustrationMode='outfit'"),'Outfit click must show outf
 assert.ok(app.includes("illustrationMode='mood'"),'Mood click must show expression');
 assert.ok(app.includes('eli-illustration-small'),'Other dimension must remain visible');
 assert.ok(!html.includes('<script src="character-v06.js'),'Old SVG character must not load');
-assert.ok(html.includes('app.js?v=0.7'));
+assert.ok(html.includes('app.js?v=0.8'));
 assert.ok(html.includes('v07.css?v=0.7'));
-assert.ok(sw.includes('eli-home-v7'));
-console.log('PASS: 10 real WebP illustrations, wardrobe/mood image switching, v0.7 cache and layout.');
+assert.ok(html.includes('v08.css?v=0.8'));
+assert.ok(html.includes('heroSceneStrip'));
+assert.ok(html.includes('dataStatus'));
+assert.ok(sw.includes('eli-home-v8'));
+for(const id of ['day','night','work','rain'])assert.ok(app.includes("id:'"+id+"'"),'Missing room '+id);
+for(const file of ['sunlit-bedroom.webp','window-workspace.webp']){
+  const buf=fs.readFileSync('assets/rooms/'+file);
+  assert.ok(buf.length>1000);
+  assert.equal(buf.toString('ascii',0,4),'RIFF');
+  assert.equal(buf.toString('ascii',8,12),'WEBP');
+}
+assert.ok(app.includes('renderDataStatus()'));
+assert.ok(app.includes('heroTagline'));
+console.log('PASS: 10 real WebP illustrations, wardrobe/mood image switching, v0.8 cache, four room scenes and data status.');
