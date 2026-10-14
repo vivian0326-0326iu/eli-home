@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 const STORAGE='eli-home-mvp-v1'; // Stable key: upgrades must not erase existing local records.
-const outfits=[{id:'charcoal',name:'炭灰卫衣',color:'#454750',accent:'#33353c',desc:'宽松的炭灰卫衣，像刚刚起床。'},{id:'cream',name:'奶油毛衣',color:'#e9ddd0',accent:'#c6b8a8',desc:'软乎乎的奶油毛衣，适合慢悠悠的一天。'},{id:'mist',name:'雾蓝外套',color:'#9fb8d3',accent:'#708fae',desc:'雾蓝色的小外套，和小家的颜色很搭。'},{id:'sage',name:'鼠尾草绿',color:'#aabfae',accent:'#7b9d8a',desc:'一件安静的绿色上衣。'},{id:'rose',name:'灰粉针织',color:'#cdaeb5',accent:'#aa8893',desc:'一点点粉色，刚刚好。'},{id:'white',name:'白衬衫',color:'#f3f3f0',accent:'#bfc7cd',desc:'今天是清清爽爽的白衬衫。'}];
+const outfits=[{id:'charcoal',name:'炭灰卫衣',color:'#454750',accent:'#33353c',desc:'宽松的炭灰卫衣，像刚刚起床。'},{id:'cream',name:'奶油毛衣',color:'#e9ddd0',accent:'#c6b8a8',desc:'软乎乎的奶油毛衣，适合慢悠悠的一天。'},{id:'mist',name:'雾蓝外套',color:'#9fb8d3',accent:'#708fae',desc:'雾蓝色的小外套，和小家的颜色很搭。'},{id:'sage',name:'休闲针织',color:'#aabfae',accent:'#7b9d8a',desc:'一件安静的绿色上衣。'},{id:'rose',name:'针织开衫',color:'#cdaeb5',accent:'#aa8893',desc:'一点点粉色，刚刚好。'},{id:'white',name:'白色衬衫',color:'#f3f3f0',accent:'#bfc7cd',desc:'今天是清清爽爽的白衬衫。'}];
 const rooms=[{id:'day',name:'晴日卧室',desc:'午后的阳光刚好落在床边。',short:'白天'},{id:'night',name:'暖灯夜晚',desc:'灯亮起来，窗外慢慢安静。',short:'夜晚'},{id:'work',name:'窗边工作角',desc:'整理想法，或者什么也不做。',short:'工作角'}];
 const moods={sleepy:{name:'困困',speech:'姐姐，再让我眯一小会儿 ♡'},happy:{name:'开心',speech:'今天也要开心一点哦 ♡'},calm:{name:'安静',speech:'不着急，我们慢慢来。'},cheer:{name:'打气',speech:'姐姐，今天也很厉害！ ✦'}};
 const categories={memory:'记忆档案',project:'项目记录',thought:'观点收藏',life:'生活记录'};
@@ -32,26 +32,31 @@ function outfitIcon(o){return `<svg viewBox="0 0 100 100" aria-hidden="true"><pa
 function avatarSvg(){const o=outfits.find(o=>o.id===state.outfit)||outfits[0];const mood=state.mood;const eyes=mood==='sleepy'?`<path d="M88 123q14 7 27-2M154 123q14 7 27-2" stroke="#4e3d3d" stroke-width="4.8" stroke-linecap="round" fill="none"/>`:mood==='happy'?`<path d="M88 126q13-14 26 0M154 126q13-14 26 0" stroke="#4e3d3d" stroke-width="4.8" stroke-linecap="round" fill="none"/>`:`<ellipse cx="102" cy="122" rx="8" ry="11" fill="#4b3838"/><ellipse cx="168" cy="122" rx="8" ry="11" fill="#4b3838"/><circle cx="105" cy="118" r="3" fill="#fff"/><circle cx="171" cy="118" r="3" fill="#fff"/>`;
 const mouth=mood==='happy'||mood==='cheer'?'<path d="M127 158q9 11 19 0" fill="none" stroke="#b77f83" stroke-width="3" stroke-linecap="round"/>':'<path d="M129 159q7 3 13 0" fill="none" stroke="#b77f83" stroke-width="3" stroke-linecap="round"/>';
 return `<svg class="avatar-svg" viewBox="0 0 270 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="黑色蓬松短发的Q版成年男性 eli，穿着${esc(o.name)}"><defs><linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe9d8"/><stop offset="1" stop-color="#f2c7b9"/></linearGradient><linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#50474a"/><stop offset=".55" stop-color="#2e2b31"/><stop offset="1" stop-color="#191d24"/></linearGradient></defs><ellipse cx="135" cy="287" rx="107" ry="10" fill="#b9aeb0" opacity=".3"/><path d="M56 232q21-37 79-39 68-1 86 39l19 68H31Z" fill="${o.color}" stroke="${o.accent}" stroke-width="3"/><path d="M104 205q31 38 61 0" fill="none" stroke="${o.accent}" stroke-width="5" opacity=".65"/><path d="M114 206v19m42-19v19" stroke="#eadbd5" stroke-width="3"/><ellipse cx="61" cy="134" rx="15" ry="22" fill="#f3c8bb"/><ellipse cx="209" cy="134" rx="15" ry="22" fill="#f3c8bb"/><path d="M69 79Q70 35 133 30q74-1 74 68l-5 59q-12 50-67 58-59-6-69-63Z" fill="url(#skin)"/><ellipse cx="92" cy="150" rx="20" ry="9" fill="#e7a5a9" opacity=".38"/><ellipse cx="178" cy="150" rx="20" ry="9" fill="#e7a5a9" opacity=".38"/>${eyes}${mouth}<path d="M78 111q19-10 38-3M155 108q19-7 37 3" stroke="#5b4749" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M58 132q-17-53-4-80Q68 19 105 29q31-41 69-13 49-11 63 35 7 31-19 74l-10-40q-7 16-24 12-8 0-16-9-14 25-43 20l-6-19q-9 24-38 29l-5 20Z" fill="url(#hair)"/><path d="M49 80Q28 59 43 40q15-19 40-8Q86 4 122 15q31-28 61-1 41-12 55 18 22 12 9 42-14-16-32-16-8-24-34-23-17 18-38 12-13 21-39 17-16 20-55 16Z" fill="url(#hair)"/><path d="M62 78q32-41 68-24M114 54q28-34 57-23M164 48q34-14 51 20" fill="none" stroke="#827476" stroke-width="4" opacity=".42" stroke-linecap="round"/><path d="M100 41q-14-21-3-33M176 39q15-22 8-34" stroke="#343036" stroke-width="9" stroke-linecap="round" fill="none"/>${mood==='cheer'?'<path d="M215 97l9-17 6 14 15-2-12 12 5 12-16-7Z" fill="#e5c588"/>':''}</svg>`}
+const illustrationOutfits={charcoal:'outfit-charcoal',cream:'outfit-cream',mist:'outfit-mist',sage:'outfit-sage',rose:'outfit-rose',white:'outfit-white'};
+const illustrationMoods={sleepy:'mood-sleepy',happy:'mood-happy',calm:'mood-calm',cheer:'mood-cheer'};
+const illustrationUrl=id=>'assets/illustrations/'+id+'.webp';
+let illustrationMode='outfit';
+try{if(localStorage.getItem('eli-illustration-mode')==='mood')illustrationMode='mood'}catch(e){}
 function renderAvatar(){
-  const outfit=outfits.find(o=>o.id===state.outfit)||outfits[0];
-  const mood=moods[state.mood]||moods.sleepy;
-  const draw=window.eliCharacterSVG;
+  const outfit=outfits.find(o=>o.id===state.outfit)||outfits[0],mood=moods[state.mood]||moods.sleepy;
+  const moodMain=illustrationMode==='mood';
+  const primary=illustrationUrl(moodMain?illustrationMoods[state.mood]:illustrationOutfits[outfit.id]);
+  const secondary=illustrationUrl(moodMain?illustrationOutfits[outfit.id]:illustrationMoods[state.mood]);
+  const secondaryLabel=moodMain?'已选衣服 · '+outfit.name:'已选表情 · '+mood.name;
   all('[data-avatar]').forEach(el=>{
-    el.innerHTML=typeof draw==='function'?draw(outfit.id,state.mood):avatarSvg();
-    el.dataset.currentOutfit=outfit.id;
-    el.dataset.currentMood=state.mood;
+    const wrap=document.createElement('div');wrap.className='eli-illustration-set';
+    const main=document.createElement('img');main.className='eli-illustration-main';main.src=primary;main.alt='eli 的插画，'+(moodMain?'表情 '+mood.name:'穿着 '+outfit.name);main.decoding='async';
+    const sub=document.createElement('div');sub.className='eli-illustration-detail';
+    const thumb=document.createElement('img');thumb.className='eli-illustration-small';thumb.src=secondary;thumb.alt=secondaryLabel;
+    const label=document.createElement('span');label.textContent=secondaryLabel;sub.append(thumb,label);wrap.append(main,sub);el.replaceChildren(wrap);
   });
   $('characterSpeech').textContent=mood.speech;
-  all('[data-mood]').forEach(b=>{
-    b.classList.toggle('selected',b.dataset.mood===state.mood);
-    b.setAttribute('aria-pressed',String(b.dataset.mood===state.mood));
-  });
-  $('outfitDescription').textContent='当前：'+outfit.name+' · '+mood.name+'。衣服款式、领口与面部表情均为独立绘制，点击下方选项可直接看到变化。';
+  all('[data-mood]').forEach(b=>{b.classList.toggle('selected',b.dataset.mood===state.mood);b.setAttribute('aria-pressed',String(b.dataset.mood===state.mood))});
+  $('outfitDescription').textContent='已选 '+outfit.name+' · '+mood.name+'。大图显示最近选择的衣服或表情，小图保留另一项；目前是两套独立插画。';
 }
 function renderOutfits(){
-  const draw=window.eliCharacterSVG;
-  const thumb=o=>typeof draw==='function'?draw(o.id,state.mood):outfitIcon(o);
-  $('miniOutfits').innerHTML=outfits.slice(0,3).map(o=>'<button class="mini-outfit '+(state.outfit===o.id?'selected':'')+'" data-outfit="'+o.id+'" aria-label="换成'+o.name+'" aria-pressed="'+String(state.outfit===o.id)+'">'+thumb(o)+'<small>'+o.name+'</small></button>').join('');
+  const thumb=o=>'<img class="eli-illustration-thumb" src="'+illustrationUrl(illustrationOutfits[o.id])+'" alt="'+o.name+'插画" loading="lazy">';
+  $('miniOutfits').innerHTML=outfits.slice(0,2).map(o=>'<button class="mini-outfit '+(state.outfit===o.id?'selected':'')+'" data-outfit="'+o.id+'" aria-label="换成'+o.name+'" aria-pressed="'+String(state.outfit===o.id)+'">'+thumb(o)+'<small>'+o.name+'</small></button>').join('');
   $('paletteDots').innerHTML=outfits.map(o=>'<button data-outfit="'+o.id+'" style="background:'+o.color+'" aria-label="'+o.name+'" title="'+o.name+'" aria-pressed="'+String(state.outfit===o.id)+'"></button>').join('');
   $('outfitSelections').innerHTML=outfits.map(o=>'<button class="outfit-card '+(state.outfit===o.id?'selected':'')+'" data-outfit="'+o.id+'" aria-pressed="'+String(state.outfit===o.id)+'">'+thumb(o)+'<span>'+o.name+'</span></button>').join('');
 }
@@ -68,7 +73,7 @@ function deleteEntry(type,id){const arr=type==='diary'?state.diaries:state.memor
 function exportData(){const blob=new Blob([JSON.stringify({...state,life,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`eli-home-backup-${chinaDate()}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('备份文件已生成')}
 async function importData(file){if(!file)return;try{if(file.size>8*1024*1024)throw Error('文件超过 8MB');const parsed=JSON.parse(await file.text());if(!validateState(parsed))throw Error('备份格式不正确或数据不完整');if(!confirm('导入将替换当前浏览器的所有日记、藏品与装扮。确定继续吗？'))return;state={version:1,outfit:parsed.outfit,mood:parsed.mood,room:parsed.room,diaries:parsed.diaries,memories:parsed.memories};if(save()){if(parsed.life&&typeof parsed.life==='object'){life={healthUrl:validUrl(parsed.life.healthUrl)?parsed.life.healthUrl||'':'',ledgerUrl:validUrl(parsed.life.ledgerUrl)?parsed.life.ledgerUrl||'':'',intake:parsed.life.intake&&typeof parsed.life.intake==='object'?parsed.life.intake:{}};saveLife()}render();loadIntakeDay();toast('备份已恢复 ♡')}}catch(e){toast(`导入失败：${e.message}`)}finally{$('importFile').value=''}}
 // Single delegated click handler keeps dynamic content interactive.
-document.addEventListener('click',e=>{const target=e.target.closest('button');if(!target)return;if(target.dataset.outfit){state.outfit=target.dataset.outfit;save();renderAvatar();renderOutfits()}if(target.dataset.mood){state.mood=target.dataset.mood;save();renderAvatar();renderOutfits()}if(target.dataset.room){state.room=target.dataset.room;save();renderRooms()}if(target.dataset.go)navigate(target.dataset.go);if(target.dataset.page)navigate(target.dataset.page);if(target.dataset.edit)openDialog(target.dataset.edit,target.dataset.id);if(target.dataset.delete)deleteEntry(target.dataset.delete,target.dataset.id)});
+document.addEventListener('click',e=>{const target=e.target.closest('button');if(!target)return;if(target.dataset.outfit){state.outfit=target.dataset.outfit;illustrationMode='outfit';try{localStorage.setItem('eli-illustration-mode',illustrationMode)}catch(e){}save();renderAvatar();renderOutfits()}if(target.dataset.mood){state.mood=target.dataset.mood;illustrationMode='mood';try{localStorage.setItem('eli-illustration-mode',illustrationMode)}catch(e){}save();renderAvatar();renderOutfits()}if(target.dataset.room){state.room=target.dataset.room;save();renderRooms()}if(target.dataset.go)navigate(target.dataset.go);if(target.dataset.page)navigate(target.dataset.page);if(target.dataset.edit)openDialog(target.dataset.edit,target.dataset.id);if(target.dataset.delete)deleteEntry(target.dataset.delete,target.dataset.id)});
 $('quickIntake').addEventListener('click',()=>{navigate('hub');$('intakeInputDate').value=chinaDate();loadIntakeDay();$('intakeCalories').focus()});
 $('openHealth').addEventListener('click',()=>openLink(life.healthUrl||HEALTH_SHEET));
 $('openLedger').addEventListener('click',()=>{if(life.ledgerUrl)openLink(life.ledgerUrl);else{navigate('hub');$('ledgerUrl').focus();toast('先填入记账网站地址')}});
