@@ -6,6 +6,8 @@ on:
       - 'assets/illustrations/**'
       - 'app.js'
       - 'v07.css'
+      - 'v09.css'
+      - 'tests/character.test.mjs'
       - '.github/workflows/character-visual.yml'
   workflow_dispatch:
 jobs:
@@ -19,7 +21,7 @@ jobs:
       - run: node tests/character.test.mjs
       - name: Install Pillow
         run: python3 -m pip install --quiet pillow
-      - name: Render ten actual illustrations
+      - name: Render ten original reference illustrations
         run: |
           python3 - <<'PY'
           from PIL import Image, ImageDraw
@@ -31,9 +33,9 @@ jobs:
               x=(i%5)*220+6;y=(i//5)*255+6
               sheet.paste(img,(x,y));d.text((x,y+215),name,fill='#40516b')
           sheet.save('illustrations-contact-sheet.png')
-          print('PASS: 10 actual illustrations rendered')
+          print('PASS: 10 original reference illustrations rendered')
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: eli-v07-illustrations
+          name: eli-v09-original-illustrations
           path: illustrations-contact-sheet.png
